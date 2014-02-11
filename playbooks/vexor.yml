@@ -1,6 +1,5 @@
 ---
 - hosts: all
-  vars:
 
 - hosts: vexor-mq
   roles:
@@ -19,4 +18,3 @@
 - hosts: vexor-worker
   roles:
     - vexor/worker
-

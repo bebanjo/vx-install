@@ -1,3 +1,7 @@
+- name: install packages required for mgmt
+  tags: mgmt
+  apt: pkg=git-core
+
 - name: clone elasticsearch-logstash-index-mgmt repo
   tags: mgmt
   git: >

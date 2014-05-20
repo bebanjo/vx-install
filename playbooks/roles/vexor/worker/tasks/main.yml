@@ -15,7 +15,7 @@
 - name: clone repo
   sudo_user: "{{ vx_user }}"
   git: >
-    repo="https://github.com/vexor/vx-worker.git"
+    repo="https://github.com/{{ vx_worker_repo }}.git"
     dest={{ vx_home }}/worker/scm version={{ vx_worker_branch }}
     update=true force=true bare=true
   register: clone_result

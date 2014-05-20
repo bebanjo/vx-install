@@ -4,7 +4,7 @@ require 'mina/git'
 set :deploy_to, "{{ vx_home }}/worker"
 
 set :domain, 'worker.example.com'
-set :repository, 'git://github.com/vexor/vx-worker.git'
+set :repository, 'git://github.com/{{ vx_worker_repo }}.git'
 set :branch, '{{ vx_worker_branch }}'
 
 set :user, '{{ vx_user }}'

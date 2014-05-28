@@ -85,6 +85,17 @@
   changed_when: "'no' in is_deploy_exists_result.stdout"
   tags: deploy
 
+# On digital ocean we cannot deploy with the services up (more memory) (except we create a swap file)
+- name: ensure services stoped
+  when: is_deploy_exists_result | changed or create_result | changed
+  service: name={{vx_user}}-{{ item }} enabled=yes state=stopped
+  tags: deploy
+  when: ansible_memtotal_mb < 1000
+  with_items:
+    - "http"
+    - "consumer"
+
+# Cannot allocate memory :P
 - name: run deploy
   shell: >
     {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/web

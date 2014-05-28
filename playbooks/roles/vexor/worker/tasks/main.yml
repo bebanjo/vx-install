@@ -6,32 +6,6 @@
     name={{ vx_user }} comment="Vexor Worker" groups=docker
     createhome=false system=true home={{ vx_home }}/worker
 
-# Use swapon -s to get the current swap file when we switch on the server
-# http://docs.ansible.com/mount_module.html
-# https://github.com/ansible/ansible/issues/5241#issuecomment-31438159
-# https://github.com/ansible/ansible/pull/6026
-
-# I'm not sure about the parameters and about the src and name options
-#- name: create swap
-#  mount: name=/dev/sda3 src=/dev/sda3 fstype=swap opts="size=4096m noatime nodiratime" state=mount
-
-- name: Create swap space
-  command: dd if=/dev/zero of=/extraswap bs=1M count=2048
-  when: ansible_swaptotal_mb < 2500
-
-- name: Make swap
-  command: mkswap /extraswap
-  when: ansible_swaptotal_mb < 2500
-
-- name: Add to fstab
-  action: lineinfile dest=/etc/fstab regexp="extraswap" line="/extraswap none swap sw 0 0" state=present
-
-- name: Turn swap on
-  command: swapon -a
-
-- name: set swapiness
-  sysctl: name=vm.swappiness value=5 state=present
-
 - name: create working directories
   file: dest={{ item }} state=directory owner={{ vx_user }}
   with_items:
@@ -82,3 +56,6 @@
 - include: forwarder.yml
   tags: forwarder
   when: "{{ logstash_server | length > 0 }}"
+
+- include: swap.yml
+  tags: swap

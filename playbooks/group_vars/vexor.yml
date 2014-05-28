@@ -17,5 +17,6 @@ vx_worker_docker_image: "pacoguzman/bebanjo-vexor-ssh"
 vx_worker_run: "docker"
 vx_worker_repo: "pacoguzman/vx-worker"
 vx_worker_branch: "bebanjo"
+vx_worker_user_uid: 999
 
 logstash_server: ""

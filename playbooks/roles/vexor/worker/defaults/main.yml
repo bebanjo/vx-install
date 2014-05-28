@@ -2,6 +2,7 @@ vx_worker_branch: "master"
 vx_worker_num_workers: "{{ ansible_processor_cores }}"
 vx_worker_docker_image: "dmexe/vexor-precise-full"
 
+vx_worker_user_uid: 999
 vx_user: "vxworker"
 vx_service: "vxworker"
 

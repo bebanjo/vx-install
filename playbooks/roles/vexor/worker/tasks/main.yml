@@ -3,7 +3,7 @@
 
 - name: create user
   user: >
-    name={{ vx_user }} comment="Vexor Worker" groups=docker
+    name={{ vx_user }} comment="Vexor Worker" groups=docker uid={{ vx_worker_user_uid }}
     createhome=false system=true home={{ vx_home }}/worker
 
 - name: create working directories
@@ -45,7 +45,7 @@
 - name: run deploy
   shell: >
     {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/worker
-  sudo_user: "{{ vx_user }}"
+  sudo_user: "{{  vx_user }}"
   when: is_deploy_exists_result | changed or create_result | changed
   notify: restart vxworker service
   tags: deploy

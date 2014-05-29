@@ -7,9 +7,13 @@ ci.example.com
 [vexor-worker]
 worker0.example.com
 
+[vexor-registry]
+ci.example.com
+
 [vexor:children]
 vexor-mq
 vexor-web
+vexor-registry
 vexor-worker
 
 [vexor:vars]

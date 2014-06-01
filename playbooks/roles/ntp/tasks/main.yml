@@ -1,0 +1,19 @@
+---
+
+- name: ntp Make sure the dependecies are installed
+  apt: name={{ item }} state=present
+  with_items:
+    - ntp
+    - ntpdate
+
+- name: create cron for use ntpdate
+  cron: name="ntpdate" user="root" cron_file=ntpdate special_time=daily
+        state=present
+        job="/usr/sbin/ntpdate-debian >> /var/log/ntpdate.log 2>&1"
+
+- name: ntp.conf configuration
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf owner=root group=root mode=0644
+  notify: restart ntp service
+
+- name: ntp service
+  service: name=ntp enabled=yes state=started

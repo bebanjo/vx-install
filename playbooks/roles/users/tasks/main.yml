@@ -1,0 +1,15 @@
+---
+
+- name: create users
+  user: name={{ item.name }} comment="BeBanjo User" shell=/bin/bash password={{ item.password }} state=present
+  with_items: ssh_users
+
+- name: setup up authorized_keys
+  authorized_key: user={{ item.name }} state=present key="{{ lookup('file', public_keys_dir + item.name + '.pub') }}"
+  with_items: ssh_users
+
+- name: add users to group admin
+  user: name={{ item.name }} groups=admin append=yes
+  with_items: ssh_users
+  when: "item.admin == True"
+

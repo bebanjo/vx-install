@@ -1,0 +1,20 @@
+---
+
+- name: openssl install
+  apt: name={{ item }} state=present
+  with_items:
+    - openssl
+    - libssl1.0.0
+    - libssl-dev
+    - ssl-cert
+    - ca-certificates
+
+- name: create directory for certificates
+  file: path=/etc/ssl/certs/bebanjo owner=root group=root mode=640 state=directory
+
+- name: copy server certificates
+  copy: src="{{ ssl_dir }}/{{ item }}"  dest="/etc/ssl/certs/bebanjo/{{ item }}" owner=root group=root mode=0640
+  with_items:
+    - server.key
+    - server.crt
+    - caauthority.crt

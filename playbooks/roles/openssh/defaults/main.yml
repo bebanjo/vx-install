@@ -1,0 +1,9 @@
+---
+
+opessh_server_settings:
+  Port: "22"
+  StrictModes: "yes"
+  PermitRootLogin: "no"
+  LoginGraceTime: "30"
+  PasswordAuthentication: "no"
+  PermitEmptyPasswords: "no"

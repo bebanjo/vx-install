@@ -1,0 +1,17 @@
+---
+
+- name: environment file
+  template: src=environment.j2 dest=/etc/environment owner=root group=root mode=0644
+
+- name: hostname ec2
+  template: src=hostname-ec2.j2 dest=/etc/hostname-ec2 owner=root group=root mode=0644
+  when: ansible_ec2_instance_id is defined
+
+- name: default bashrc
+  template: src=bashrc.j2 dest=/etc/skel/.bashrc owner=root group=root mode=0644
+
+- name: copy bashrc for ubuntu user
+  template: src=bashrc.j2 dest=/home/ubuntu/.bashrc owner=ubuntu group=ubuntu mode=644
+
+- name: copy bashrc for root user
+  template: src=bashrc.j2 dest=/root/.bashrc owner=root group=root mode=644

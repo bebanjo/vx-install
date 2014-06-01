@@ -1,0 +1,15 @@
+---
+
+- name: install openssh server
+  apt: name={{ item }} state=present
+  with_items:
+  - openssh-client
+  - openssh-server
+  - openssh-sftp-server
+
+- name: sshd_config
+  template: src=sshd_config.j2 dest=/etc/ssh/sshd_config owner=root group=root mode=0644 validate="/usr/sbin/sshd -f %s -t"
+  notify: reload ssh
+
+- name: ssh service
+  service: name=ssh enabled=yes state=started

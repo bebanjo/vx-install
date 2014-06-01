@@ -1,0 +1,11 @@
+---
+- name: update apt cache
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: install common packages
+  apt: name={{ item }} state=present
+  with_items:
+    - sysstat
+    - htop
+    - vim
+    - screen

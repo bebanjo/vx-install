@@ -1,0 +1,8 @@
+---
+
+- name: sudo install packages
+  apt: name=sudo state=present
+
+- name: Copy sudoers file
+  action: template src=sudoers.j2 dest=/etc/sudoers mode=440 owner=root group=root validate='visudo -cf %s'
+

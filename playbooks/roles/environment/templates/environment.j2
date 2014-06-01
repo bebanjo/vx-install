@@ -1,0 +1,10 @@
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+ANSIBLE_ENV={{ inventory_file | basename }}
+ENVIRONMENT={{ inventory_file | basename }}
+{% if ansible_ec2_instance_id is defined %}
+EC2=true
+EC2_REGION={{ ansible_ec2_placement_region }}
+EC2_AZ={{ ansible_ec2_placement_availability_zone }}
+{% else %}
+EC2=false
+{% endif %}

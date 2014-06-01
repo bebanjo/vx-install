@@ -1,0 +1,16 @@
+---
+- hosts: all
+  sudo: yes
+
+  pre_tasks:
+    - name: get ec2 facts
+      action: ec2_facts
+
+  roles:
+    - environment
+    - common
+    - ntp
+    - users
+    - sudo
+    - ssl
+    - openssh

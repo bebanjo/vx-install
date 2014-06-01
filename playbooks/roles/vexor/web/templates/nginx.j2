@@ -3,8 +3,11 @@ upstream {{ vx_user }}_upstream {
 }
 
 server {
-  listen 80;
-  server_name _;
+  listen 443 ssl;
+  server_name {{ vx_web_hostname }};
+
+  ssl_certificate /etc/ssl/certs/{{ company_name }}/bundle.crt;
+  ssl_certificate_key /etc/ssl/certs/{{ company_name }}/server.key;
 
   client_max_body_size 4G;
   keepalive_timeout 5;
@@ -54,5 +57,15 @@ server {
   error_page 500 502 503 504 /500.html;
   location = /500.html {
     root {{ vx_home }}/web/current/public;
+  }
+
+}
+
+server {
+  listen 80;
+  server_name {{ vx_web_hostname }};
+
+  if ($scheme = http) {
+    return 301 https://$server_name$request_uri;
   }
 }

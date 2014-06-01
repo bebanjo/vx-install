@@ -1,5 +1,2 @@
-- name: restart gunicorn
-  service: name=gunicorn-{{ host }} state=restarted
-
 - name: restart docker-registry
   service: name=docker-registry state=restarted

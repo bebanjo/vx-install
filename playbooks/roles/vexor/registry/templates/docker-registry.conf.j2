@@ -1,18 +1,32 @@
 description "Docker Registry start"
 
-start on runlebel [3]
+start on runlevel [345]
 stop on shutdown
+
+console log
+
+respawn
+respawn limit 10 5
 
 expect fork
 
+chdir /opt/docker-registry
+
+env REGISTRY_HOME=/opt/docker-registry
+env DOCKER_REGISTRY_CONFIG=/opt/docker-registry/config/config.yml
+env SETTINGS_FLAVOR=dev
+
+env GUNICORN_WORKERS=4
+env REGISTRY_PORT=5000
+env GUNICORN_GRACEFUL_TIMEOUT=3600
+env GUNICORN_SILENT_TIMEOUT=3600
+
 script
-      cd {{ project_root }}/docker-registry
-      GUNICORN_WORKERS=${GUNICORN_WORKERS:-4}
-      REGISTRY_PORT=${REGISTRY_PORT:-5000}
-      GUNICORN_GRACEFUL_TIMEOUT=${GUNICORN_GRACEFUL_TIMEOUT:-3600}
-      GUNICORN_SILENT_TIMEOUT=${GUNICORN_SILENT_TIMEOUT:-3600}
+  cd /opt/docker-registry
 
-      gunicorn --access-logfile - --debug --max-requests 100 --graceful-timeout $GUNICORN_GRACEFUL_TIMEOUT -t $GUNICORN_SILENT_TIMEOUT -k gevent -b 0.0.0.0:$REGISTRY_PORT -w $GUNICORN_WORKERS wsgi:application &
+  gunicorn --access-logfile /var/log/docker-registry/access.log --error-logfile /var/log/docker-registry/error.log --debug \
+           --max-requests 100 -k gevent -b 0.0.0.0:$REGISTRY_PORT \
+           --graceful-timeout $GUNICORN_GRACEFUL_TIMEOUT -t $GUNICORN_SILENT_TIMEOUT \
+           -w $GUNICORN_WORKERS docker_registry.wsgi:application &
 
-      emit docker-registry_running
 end script

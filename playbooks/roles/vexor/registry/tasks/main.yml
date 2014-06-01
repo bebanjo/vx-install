@@ -35,10 +35,9 @@
 - name: Start docker-registry service
   service: name=docker-registry state=started
 
-#- name: write gunicorn init script
-#  template: src=gunicorn.upstart.j2 dest=/etc/init/gunicorn-{{ host }}.conf
-#  notify:
-#    - restart gunicorn
-#
-#- name: restart gunicorn
-#  service: name=gunicorn-{{ host }} state=restarted
+- name: Directory for logging
+  file: path=/var/log/docker-registry owner=root group=root mode=666 state=directory
+
+- name: vhost for nginx
+  template: src=docker-registry-nginx.conf.j2 dest=/etc/nginx/conf.d/docker-registry.conf owner=root group=root mode=644
+  notify: restart nginx service

@@ -1,6 +1,7 @@
 - name: add erlang-solutions apt repo key
   apt_key: >
     url=http://packages.erlang-solutions.com/debian/erlang_solutions.asc
+  ignore_errors: yes
 
 - name: add erlang-solutions apt repo
   apt_repository: >

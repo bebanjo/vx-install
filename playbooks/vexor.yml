@@ -1,5 +1,6 @@
 ---
 - hosts: vexor
+  sudo: true
   vars:
 
 - hosts: vexor-mq

@@ -7,10 +7,13 @@
     createhome=false system=true home={{ vx_home }}/worker
 
 - name: create working directories
-  file: dest={{ item }} state=directory owner={{ vx_user }}
+  file: dest={{ item }} state=directory owner={{ vx_user }} group={{ vx_user }}
   with_items:
     - "{{ vx_home }}/worker"
     - "{{ vx_home }}/worker/releases"
+    - "{{ vx_home }}/worker/shared"
+    - "{{ vx_home }}/worker/shared/cache"
+    - "{{ vx_home }}/worker/shared/cache/bundle"
 
 - name: clone repo
   sudo_user: "{{ vx_user }}"
@@ -28,8 +31,8 @@
     dest={{ item.dest }} src={{ item.src }}
     owner={{ vx_user }} mode={{ item.mode }}
   with_items:
-    - { dest: "{{ vx_home}}/bin/worker", src: "worker.j2", mode: "0755" }
-    - { dest: "{{ vx_etc_path}}/Envfile", src: "env.j2", mode: "0600" }
+    - { dest: "{{ vx_home }}/bin/worker", src: "worker.j2", mode: "0755" }
+    - { dest: "{{ vx_etc_path }}/Envfile", src: "env.j2", mode: "0600" }
     - { dest: "/etc/init/{{ vx_service }}.conf", src: "upstart.j2", mode: "0755" }
     - { dest: "{{ vx_home }}/worker/deploy.rb", src: "deploy.rb", mode: "0644" }
   register: create_result

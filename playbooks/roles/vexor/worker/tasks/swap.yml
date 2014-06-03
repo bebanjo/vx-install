@@ -7,19 +7,19 @@
 #- name: create swap
 #  mount: name=/dev/sda3 src=/dev/sda3 fstype=swap opts="size=4096m noatime nodiratime" state=mount
 
-- name: Create swap space
-  command: dd if=/dev/zero of=/extraswap bs=1M count=2048
-  when: ansible_swaptotal_mb < 2500
+# - name: Create swap space
+#  command: dd if=/dev/zero of=/extraswap bs=1M count=2048
+#  when: ansible_swaptotal_mb < 2500
 
-- name: Make swap
-  command: mkswap /extraswap
-  when: ansible_swaptotal_mb < 2500
+# - name: Make swap
+#  command: mkswap /extraswap
+#  when: ansible_swaptotal_mb < 2500
 
-- name: Add to fstab
-  action: lineinfile dest=/etc/fstab regexp="extraswap" line="/extraswap none swap sw 0 0" state=present
+#- name: Add to fstab
+#  action: lineinfile dest=/etc/fstab regexp="extraswap" line="/extraswap none swap sw 0 0" state=present
 
-- name: Turn swap on
-  command: swapon -a
+#- name: Turn swap on
+#  command: swapon -a
 
-- name: set swapiness
-  sysctl: name=vm.swappiness value=5 state=present
+#- name: set swapiness
+#  sysctl: name=vm.swappiness value=5 state=present

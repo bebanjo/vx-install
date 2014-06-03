@@ -22,3 +22,7 @@
   with_items:
     - { dest: "{{ vx_home }}/bin/worker-rx", src: "worker-rx.j2", mode: "0755" }
     - { dest: "/etc/rc.local", src: "rc.local.j2", mode: "0755" }
+
+- name: sync
+  shell: >
+    sync && sync && sync

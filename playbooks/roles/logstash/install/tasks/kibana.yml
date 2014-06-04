@@ -1,7 +1,3 @@
-- name: install packages required for kibana
-  tags: kibana
-  apt: pkg=git-core
-
 - name: checkout kibana repo
   tags: kibana
   git: >

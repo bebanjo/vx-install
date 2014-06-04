@@ -1,3 +1,6 @@
+- name: install required packages
+  apt: pkg=git-core
+
 - name: create logstash user
   user: >
     name=logstash comment="logstash daemon"

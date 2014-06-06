@@ -7,10 +7,10 @@
       action: ec2_facts
 
   roles:
+    - users
     - environment
     - common
     - ntp
-    - users
     - sudo
     - ssl
     - openssh

@@ -1,5 +1,11 @@
 ---
 
+- name: ensure ubuntu user exits
+  user: name=ubuntu comment="Cloud support" shell=/bin/bash state=present
+
+- name: ensure admin group
+  group: name=admin state=present
+
 - name: create users
   user: name={{ item.name }} comment="BeBanjo User" shell=/bin/bash password={{ item.password }} state=present
   with_items: ssh_users

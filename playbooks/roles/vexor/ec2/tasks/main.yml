@@ -1,0 +1,33 @@
+- name: create sources list
+  template: dest=/etc/apt/sources.list src=sources.list.j2 mode=0644
+
+- name: run apt update
+  apt: update_cache=yes
+
+- name: install required packages
+  apt: pkg={{ item }}
+  with_items:
+    - "ec2-api-tools"
+
+- name: pull docker image
+  action: shell docker pull {{ item }}
+  register: result
+  until: result.stdout.find("Download complete") != -1
+  retries: 20
+  with_items:
+    - "dmexe/vexor-precise-full"
+    - "dmexe/vexor-precise"
+
+- name: create ec2_shutdown
+  template: src=ec2_shutdown.j2 dest=/usr/sbin/ec2_shutdown mode=0755
+
+- name: create files
+  template: >
+    dest={{ item.dest }} src={{ item.src }} mode={{ item.mode }}
+  with_items:
+    - { dest: "{{ vx_home }}/bin/worker-ec2", src: "worker-ec2.j2", mode: "0755" }
+    - { dest: "/etc/rc.local", src: "rc.local.j2", mode: "0755" }
+
+- name: sync
+  shell: >
+    sync && sync && sync

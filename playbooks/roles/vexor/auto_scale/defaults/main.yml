@@ -15,3 +15,6 @@ vx_as_password: "{{ lookup('password', vx_as_password_file + ' length=30 chars=n
 sdk_username: "{{ lookup('env', 'SDK_USERNAME') }}"
 sdk_token: "{{ lookup('env', 'SDK_TOKEN') }}"
 sdk_region: "{{ lookup('env', 'SDK_REGION') }}"
+
+aws_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+aws_secret: "{{ lookup('env', 'AWS_SECRET_KEY') }}"

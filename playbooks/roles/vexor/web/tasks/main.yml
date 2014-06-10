@@ -12,11 +12,6 @@
     login_host=/var/run/postgresql
   register: create_db_result
 
-- name: create hstore extension in postgresql
-  sudo_user: postgres
-  shell: psql {{ vx_db_name }} -c "CREATE EXTENSION IF NOT EXISTS hstore;"
-  when: create_db_result | changed
-
 - name: create postgresql user
   sudo_user: postgres
   postgresql_user: >

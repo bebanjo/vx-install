@@ -18,12 +18,11 @@ ansible_ssh_user=ubuntu
 
 github_key=<YOU GITHUB KEY>
 github_secret=<YOU GITHUB SECRET>
-github_restriction=<YOU ORGANIZATION NAME>
 
-gitlab_url=http://demo.gitlab.com,gitlab.example.com
 
 # vx_web_hostname=ci.example.com
 # vx_web_num_workers=8
+# vx_web_signup=True
 
 # vx_worker_num_workers=3
 # vx_worker_docker_image: "dmexe/vexor-precise-full"

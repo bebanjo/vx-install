@@ -5,6 +5,3 @@ vx_worker_disable_service: 'false'
 
 vx_user: "vxworker"
 vx_service: "vxworker"
-
-airbrake_api_key: null
-airbrake_host: null

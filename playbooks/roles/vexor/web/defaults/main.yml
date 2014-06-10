@@ -1,6 +1,7 @@
 vx_web_num_workers: "{{ ansible_processor_cores }}"
 vx_web_hostname: null
 vx_web_branch: "master"
+vx_web_signup: False
 
 vx_user: "vxweb"
 vx_db_name: "{{ vx_user }}_production"
@@ -14,8 +15,3 @@ vx_db_url: >
 
 github_key: null
 github_secret: null
-
-airbrake_api_key: null
-airbrake_host: null
-
-gitlab_url: null

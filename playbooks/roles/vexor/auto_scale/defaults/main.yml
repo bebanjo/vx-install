@@ -18,3 +18,4 @@ sdk_region: "{{ lookup('env', 'SDK_REGION') }}"
 
 aws_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
 aws_secret: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+aws_key_name: "{{ lookup('env', 'AWS_KEY_NAME') }}"

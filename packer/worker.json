@@ -1,16 +1,14 @@
 {
   "builders": [
     {
-      "flavor": "performance1-4",
-      "image_name": "vexor_ci.worker {{timestamp}}",
-      "provider": "rackspace-us",
-      "region": "IAD",
-      "source_image": "bb02b1a3-bc77-4d17-ab5b-421d89850fca",
-      "ssh_username": "root",
-      "type": "openstack"
-    }
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami": "ami-018c9568",
+      "instance_type": "c3.large",
+      "ssh_username": "ubuntu",
+      "ami_name": "a0.vexor.io {{timestamp}}"
+    },
   ],
-  "post-processors": null,
   "provisioners": [
     {
       "script": "packer/before.sh",
@@ -41,8 +39,8 @@
     }
   ],
   "variables": {
-    "os_token": "{{env `SDK_TOKEN`}}",
-    "os_username": "{{env `SDK_USERNAME`}}"
+    "os_token": "{{env `AWS_ACCESS_KEY`}}",
+    "os_username": "{{env `AWS_SECRET_KEY`}}"
   }
 }
 

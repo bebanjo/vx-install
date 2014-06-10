@@ -11,9 +11,6 @@
 
 - name: pull docker image
   action: shell docker pull {{ item }}
-  register: result
-  until: result.stdout.find("Download complete") != -1
-  retries: 20
   with_items:
     - "dmexe/vexor-precise-full"
     - "dmexe/vexor-precise"
@@ -27,7 +24,3 @@
   with_items:
     - { dest: "{{ vx_home }}/bin/worker-ec2", src: "worker-ec2.j2", mode: "0755" }
     - { dest: "/etc/rc.local", src: "rc.local.j2", mode: "0755" }
-
-- name: sync
-  shell: >
-    sync && sync && sync

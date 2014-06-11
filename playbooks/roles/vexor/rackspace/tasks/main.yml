@@ -6,9 +6,6 @@
 
 - name: pull docker image
   action: shell docker pull {{ item }}
-  register: result
-  until: result.stdout.find("Download complete") != -1
-  retries: 20
   with_items:
     - "dmexe/vexor-precise-full"
     - "dmexe/vexor-precise"

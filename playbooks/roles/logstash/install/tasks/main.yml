@@ -9,10 +9,11 @@
     - "{{ logstash_root }}"
     - "{{ logstash_root }}/config"
 
-- name: download package
-  get_url: >
-    url={{ logstash_download_url }}
-    dest={{ logstash_root }}/logstash.jar
+- name: download and unpack package
+  shell: >
+    curl -s {{ logstash_download_url }} | tar -zxf -
+    chdir=/opt
+    creates={{ logstash_root }}/bin/logstash
 
 - name: generate ssl serificate for forwarder
   sudo: false

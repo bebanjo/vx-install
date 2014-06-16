@@ -13,7 +13,7 @@ setgid logstash
 script
   home=/opt/logstash-{{ logstash_version }}
   user=logstash
-  command="java -jar logstash.jar agent -f config/indexer.conf"
+  command="bin/logstash agent -f config/indexer.conf"
 
   chdir $home
   exec $command

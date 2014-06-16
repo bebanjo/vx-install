@@ -19,6 +19,7 @@
     name={{ vx_user }}
     password={{ vx_db_password }}
     priv=ALL
+    role_attr_flags=CREATEDB,SUPERUSER,LOGIN
     login_host=/var/run/postgresql
 
 - name: create nginx vhost

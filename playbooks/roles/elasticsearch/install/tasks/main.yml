@@ -2,6 +2,7 @@
   apt: pkg={{ item }}
   with_items:
     - curl
+    - git-core
 
 - name: download and unpack archive
   shell: >

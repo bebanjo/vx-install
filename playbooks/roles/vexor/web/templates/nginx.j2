@@ -2,9 +2,27 @@ upstream {{ vx_user }}_upstream {
   server 127.0.0.1:3000;
 }
 
+{% if vx_web_use_ssl %}
 server {
   listen 80;
   server_name _;
+
+  rewrite ^ https://$host$request_uri? permanent;
+}
+{% endif %}
+
+server {
+  server_name _;
+
+  {% if vx_web_use_ssl %}
+    listen 443;
+    ssl                  on;
+    ssl_certificate      /etc/nginx/vxweb.crt;
+    ssl_certificate_key  /etc/nginx/vxweb.key;
+    ssl_session_timeout  30m;
+  {% else %}
+    listen 80;
+  {% endif %}
 
   client_max_body_size 4G;
   keepalive_timeout 5;

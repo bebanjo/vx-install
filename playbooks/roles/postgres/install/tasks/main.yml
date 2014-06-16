@@ -13,5 +13,13 @@
     state=present
   notify: restart postgresql service
 
+- name: apply max connections
+  lineinfile: >
+    dest=/etc/postgresql/{{ postgres_version }}/main/postgresql.conf
+    regexp='max_connections'
+    line="max_connections = {{ postgres_max_connections }}"
+    state=present
+  notify: restart postgresql service
+
 - name: ensure service up and running
   service: name=postgresql enabled=yes state=started

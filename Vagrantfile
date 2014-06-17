@@ -34,5 +34,36 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
   end
+
+  sources = <<SOURCES
+#############################################################
+################### OFFICIAL UBUNTU REPOS ###################
+#############################################################
+
+###### Ubuntu Main Repos
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse
+
+###### Ubuntu Update Repos
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse
+SOURCES
+
+  script = <<SCRIPT
+set -e
+
+echo "---> Update /etc/apt/sources.list"
+
+cat > /etc/apt/sources.list <<EOL
+#{sources}
+EOL
+
+echo "---> Run apt-get update"
+apt-get update -qy > /dev/null
+SCRIPT
+
+  config.vm.provision "shell", inline: script
 end
 

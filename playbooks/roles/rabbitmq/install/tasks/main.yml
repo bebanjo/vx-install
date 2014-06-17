@@ -7,3 +7,8 @@
 
 - name: remove guest user
   rabbitmq_user: name=guest state=absent
+  when: rabbitmq_remove_guest
+
+- name: create configuration file
+  template: src=config.j2 dest=/etc/rabbitmq/rabbitmq.config owner=root group=root mode=0644
+  notify: restart rabbitmq service

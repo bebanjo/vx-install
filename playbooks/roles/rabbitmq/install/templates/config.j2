@@ -1,0 +1,5 @@
+[
+  {% if not rabbitmq_remove_guest %}
+  {rabbit, [{loopback_users, []}]}
+  {% endif %}
+].

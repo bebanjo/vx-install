@@ -5,4 +5,4 @@ logstash_root: "/opt/logstash-{{ logstash_version }}"
 logstash_kibana_password_file: "{{ credentials_dir }}/kibana.htpasswd"
 logstash_kibana_password: "{{ lookup('password', logstash_kibana_password_file + ' length=30 chars=numbers,digits') }}"
 
-kibana_version: "v3.1.0"
+kibana_version: "master"

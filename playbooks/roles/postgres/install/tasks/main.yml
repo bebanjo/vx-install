@@ -1,4 +1,5 @@
 - name: install postgres packages
+  tags: postgres
   apt: pkg={{ item }}
   with_items:
     - "postgresql-{{ postgres_version }}"
@@ -6,6 +7,7 @@
     - "python-psycopg2"
 
 - name: apply listen parameter
+  tags: postgres
   lineinfile: >
     dest=/etc/postgresql/{{ postgres_version }}/main/postgresql.conf
     regexp='listen_addresses'
@@ -14,6 +16,7 @@
   notify: restart postgresql service
 
 - name: apply max connections
+  tags: postgres
   lineinfile: >
     dest=/etc/postgresql/{{ postgres_version }}/main/postgresql.conf
     regexp='max_connections'
@@ -22,4 +25,5 @@
   notify: restart postgresql service
 
 - name: ensure service up and running
+  tags: postgres
   service: name=postgresql enabled=yes state=started

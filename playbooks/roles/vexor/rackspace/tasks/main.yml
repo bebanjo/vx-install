@@ -7,8 +7,7 @@
 - name: pull docker image
   action: shell docker pull {{ item }}
   with_items:
-    - "dmexe/vexor-precise-full"
-    - "dmexe/vexor-precise"
+    - "dmexe/vexor-trusty-full"
 
 - name: create rx_shutdown
   template: src=rx_shutdown.j2 dest=/usr/sbin/rx_shutdown mode=0755

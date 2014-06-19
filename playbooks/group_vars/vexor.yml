@@ -7,7 +7,6 @@ vx_web_hostname: null
 vx_web_branch: "master"
 
 vx_worker_num_workers: "{{ ansible_processor_cores }}"
-vx_worker_docker_image: "dmexe/vexor-precise-full"
 vx_worker_branch: "master"
 
 logstash_server: ""

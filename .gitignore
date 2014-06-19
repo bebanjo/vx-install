@@ -6,3 +6,4 @@ credentials/
 packer/upload.tgz
 *.pem
 packer/os_shutdown
+/vendor/

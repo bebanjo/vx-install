@@ -36,9 +36,17 @@ server {
     proxy_set_header Host $http_host;
     proxy_set_header X-Real-IP $remote_addr;
 
+    proxy_set_header X-Sendfile-Type X-Accel-Redirect;
+    proxy_set_header X-Accel-Mapping /f/cached_files/={{ vx_home }}/web/shared/private/production/cached_file/;
+
     proxy_redirect off;
 
     proxy_pass http://{{ vx_user}}_upstream;
+  }
+
+  location /f/cached_files/ {
+    internal;
+    alias {{ vx_home }}/web/shared/private/production/cached_file/;
   }
 
   location ~ ^/api/events {

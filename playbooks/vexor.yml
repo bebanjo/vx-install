@@ -11,12 +11,9 @@
     - elasticsearch/install
     - logstash/install
 
-- hosts: vexor-db
-  roles:
-    - vexor/db
-
 - hosts: vexor-web
   roles:
+    - vexor/db
     - vexor/web
 
 - hosts: vexor-backoffice

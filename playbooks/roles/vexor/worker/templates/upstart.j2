@@ -9,7 +9,7 @@ console log
 
 script
   home={{ vx_home }}/worker
-  user={{ vx_user }}
+  user={{ vx_worker_user }}
   command="{{ vx_home }}/bin/worker"
 
   exec start-stop-daemon -S -d $home -c $user:$user -g docker -x $command

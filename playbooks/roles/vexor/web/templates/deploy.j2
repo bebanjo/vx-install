@@ -5,7 +5,7 @@ require 'mina/git'
 set :deploy_to, "{{ vx_home }}/web"
 
 set :domain, 'web.example.com'
-set :repository, 'git://github.com/vexor/vx-web.git'
+set :repository, '{{ vx_home }}/web/scm'
 set :branch, '{{ vx_web_branch }}'
 
 set :user, '{{ vx_web_user }}'

@@ -3,17 +3,17 @@
 
 - name: create user
   user: >
-    name={{ vx_user }} comment="Vexor Worker" groups=docker
+    name={{ vx_worker_user }} comment="Vexor Worker" groups=docker
     createhome=false system=true home={{ vx_home }}/worker
 
 - name: create working directories
-  file: dest={{ item }} state=directory owner={{ vx_user }}
+  file: dest={{ item }} state=directory owner={{ vx_worker_user }}
   with_items:
     - "{{ vx_home }}/worker"
     - "{{ vx_home }}/worker/releases"
 
 - name: clone repo
-  sudo_user: "{{ vx_user }}"
+  sudo_user: "{{ vx_worker_user }}"
   git: >
     repo="https://github.com/vexor/vx-worker.git"
     dest={{ vx_home }}/worker/scm version={{ vx_worker_branch }}
@@ -26,10 +26,10 @@
 - name: create files
   template: >
     dest={{ item.dest }} src={{ item.src }}
-    owner={{ vx_user }} mode={{ item.mode }}
+    owner={{ vx_worker_user }} mode={{ item.mode }}
   with_items:
     - { dest: "{{ vx_home}}/bin/worker", src: "worker.j2", mode: "0755" }
-    - { dest: "{{ vx_etc_path}}/Envfile", src: "env.j2", mode: "0600" }
+    - { dest: "{{ vx_etc_path}}/vxworker.env", src: "env.j2", mode: "0600" }
     - { dest: "{{ vx_home }}/worker/deploy.rb", src: "deploy.rb", mode: "0644" }
   register: create_result
   tags: deploy
@@ -37,9 +37,9 @@
 - name: create upstart job
   template: >
     dest={{ item.dest }} src={{ item.src }}
-    owner={{ vx_user }} mode={{ item.mode }}
+    owner={{ vx_worker_user }} mode={{ item.mode }}
   with_items:
-    - { dest: "/etc/init/{{ vx_service }}.conf", src: "upstart.j2", mode: "0755" }
+    - { dest: "/etc/init/{{ vx_worker_user }}.conf", src: "upstart.j2", mode: "0755" }
   when: vx_worker_disable_service != 'true'
   register: upstart_result
   tags: deploy
@@ -54,13 +54,13 @@
 - name: run deploy
   shell: >
     {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/worker
-  sudo_user: "{{ vx_user }}"
+  sudo_user: "{{ vx_worker_user }}"
   when: is_deploy_exists_result | changed or create_result | changed or upstart_result | changed
   notify: restart vxworker service
   tags: deploy
 
 - name: add logrotate script
-  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_user }} mode="0644" owner=root
+  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_worker_user }} mode="0644" owner=root
 
 - include: forwarder.yml
   tags: forwarder

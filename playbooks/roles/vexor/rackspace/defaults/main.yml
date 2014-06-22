@@ -3,6 +3,4 @@ rx_user: "{{ lookup('env', 'SDK_USERNAME') }}"
 rx_token: "{{ lookup('env', 'SDK_TOKEN') }}"
 rx_region: "{{ lookup('env', 'SDK_REGION') }}"
 
-vx_user: "vxworker"
-vx_service: "vxworker"
-
+vx_worker_user: "vxworker"

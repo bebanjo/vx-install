@@ -1,0 +1,9 @@
+vx_db_user: "vxweb"
+vx_db_name: "{{ vx_db_user }}_production"
+vx_db_pool: 50
+vx_db_password_file: >
+  {{ credentials_dir }}/{{ vx_db_user }}.postgres
+vx_db_password: >
+  {{ lookup('password', vx_db_password_file + ' length=30 chars=ascii_letters,digits') }}
+vx_db_url: >
+  postgres://{{ vx_db_user }}:{{ vx_db_password }}@localhost/{{ vx_db_name }}?pool={{ vx_db_pool }}

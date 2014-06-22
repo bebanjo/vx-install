@@ -1,0 +1,17 @@
+- name: create postgresql database
+  tags: create_pg_database
+  sudo_user: postgres
+  postgresql_db: >
+    name={{ vx_db_name }}
+    encoding='UTF-8'
+    login_host=/var/run/postgresql
+
+- name: create postgresql user
+  sudo_user: postgres
+  postgresql_user: >
+    db={{ vx_db_name }}
+    name={{ vx_db_user }}
+    password={{ vx_db_password }}
+    priv=ALL
+    role_attr_flags=CREATEDB,SUPERUSER,LOGIN
+    login_host=/var/run/postgresql

@@ -3,25 +3,6 @@
     name={{ vx_user }} comment="Vexor Web Worker"
     createhome=false system=true home={{ vx_home }}/web
 
-- name: create postgresql database
-  tags: create_pg_database
-  sudo_user: postgres
-  postgresql_db: >
-    name={{ vx_db_name }}
-    encoding='UTF-8'
-    login_host=/var/run/postgresql
-  register: create_db_result
-
-- name: create postgresql user
-  sudo_user: postgres
-  postgresql_user: >
-    db={{ vx_db_name }}
-    name={{ vx_user }}
-    password={{ vx_db_password }}
-    priv=ALL
-    role_attr_flags=CREATEDB,SUPERUSER,LOGIN
-    login_host=/var/run/postgresql
-
 - name: upload ssl certificates
   copy: src={{ item.l }} dest={{ item.r }} mode=0640 owner=nginx
   with_items:
@@ -62,7 +43,7 @@
     dest={{ item.dest }} src={{ item.src }}
     owner={{ vx_user }} mode={{ item.mode }}
   with_items:
-    - { dest: "{{ vx_etc_path}}/Envfile", src: "env.j2", mode: "0600" }
+    - { dest: "{{ vx_etc_path}}/vxweb.env", src: "env.j2", mode: "0600" }
     - { dest: "{{ vx_home }}/web/deploy.rb", src: "deploy.j2", mode: "0644" }
     - { dest: "{{ vx_home }}/web/shared/config/puma.rb", src: "puma.j2", mode: "0644" }
     - { dest: "{{ vx_home }}/bin/{{ vx_user }}-http", src: "vxweb-http.j2", mode: "0755" }

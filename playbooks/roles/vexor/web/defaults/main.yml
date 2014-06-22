@@ -1,18 +1,17 @@
+vx_user: "vxweb"
+
 vx_web_num_workers: "{{ ansible_processor_cores }}"
 vx_web_hostname: null
 vx_web_branch: "master"
 vx_web_signup: False
 vx_web_use_ssl: False
 
-vx_user: "vxweb"
-vx_db_name: "{{ vx_user }}_production"
-vx_db_pool: 50
-vx_db_password_file: >
-  {{ credentials_dir }}/{{vx_user}}.postgres
-vx_db_password: >
-  {{ lookup('password', vx_db_password_file + ' length=30 chars=numbers,digits') }}
-vx_db_url: >
-  postgres://{{ vx_user }}:{{ vx_db_password }}@localhost/{{ vx_db_name }}?pool={{ vx_db_pool }}
+vx_web_secret_file: >
+  {{ credentials_dir }}/{{vx_user}}.rails.secret
+vx_web_secret: >
+  {{ lookup('password', vx_web_secret_file + ' length=128 chars=ascii_letters,digits') }}
+
+
 
 github_key: null
 github_secret: null

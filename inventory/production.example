@@ -4,6 +4,9 @@ mq0.example.com
 [vexor-web]
 ci.example.com
 
+[vexor-db]
+ci.example.com
+
 [vexor-worker]
 worker0.example.com
 
@@ -11,6 +14,7 @@ worker0.example.com
 vexor-mq
 vexor-web
 vexor-worker
+vexor-db
 
 [vexor:vars]
 

@@ -1,4 +1,4 @@
 ---
 dependencies:
-  - { role: vexor/mq-env }
+  - { role: postgres/install }
   - { role: vexor/db-env }

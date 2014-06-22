@@ -1,4 +1,4 @@
-vx_user: "vxweb"
+vx_web_user: "vxweb"
 
 vx_web_num_workers: "{{ ansible_processor_cores }}"
 vx_web_hostname: null
@@ -7,11 +7,9 @@ vx_web_signup: False
 vx_web_use_ssl: False
 
 vx_web_secret_file: >
-  {{ credentials_dir }}/{{vx_user}}.rails.secret
+  {{ credentials_dir }}/{{vx_web_user}}.rails.secret
 vx_web_secret: >
   {{ lookup('password', vx_web_secret_file + ' length=128 chars=ascii_letters,digits') }}
-
-
 
 github_key: null
 github_secret: null

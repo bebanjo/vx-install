@@ -2,13 +2,13 @@ require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
 
-set :deploy_to, "{{ vx_home }}/web"
+set :deploy_to, "{{ vx_home }}/back_office"
 
 set :domain, 'web.example.com'
-set :repository, 'git://github.com/vexor/vx-web.git'
-set :branch, '{{ vx_web_branch }}'
+set :repository, '{{ vx_home }}/back_office/scm'
+set :branch, '{{ vx_back_office_branch }}'
 
-set :user, '{{ vx_web_user }}'
+set :user, '{{ vx_back_office_user }}'
 
 set :shared_paths, ['log', 'config/puma.rb', 'tmp/pids', 'private']
 
@@ -31,7 +31,6 @@ task :deploy => :setup do
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
 
-    invoke :'rails:db_migrate'
     invoke :'rails:assets_precompile'
 
     to :launch do
@@ -39,3 +38,4 @@ task :deploy => :setup do
     end
   end
 end
+

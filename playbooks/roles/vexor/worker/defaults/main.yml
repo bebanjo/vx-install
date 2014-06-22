@@ -2,5 +2,6 @@ vx_worker_user: "vxworker"
 vx_worker_branch: "master"
 vx_worker_num_workers: "{{ ansible_processor_cores }}"
 vx_worker_docker_image: "dmexe/vexor-trusty-full"
-vx_worker_disable_service: 'false'
+vx_worker_service_autostart: True
+vx_worker_control_timeout: 0
 

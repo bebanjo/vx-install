@@ -20,3 +20,4 @@
 - name: ensure logstash-forwarder service up and running
   tags: logstash
   service: name=logstash-forwarder state=running enabled=yes
+  when: vx_worker_service_autostart

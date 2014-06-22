@@ -1,5 +1,5 @@
-upstream {{ vx_user }}_upstream {
-  server 127.0.0.1:3000;
+upstream {{ vx_cloud_user }}_upstream {
+  server 127.0.0.1:3002;
 }
 
 server {
@@ -10,9 +10,9 @@ server {
   keepalive_timeout 5;
 
   auth_basic "Restricted";
-  auth_basic_user_file /etc/nginx/{{ vx_user }}.htpasswd;
+  auth_basic_user_file /etc/nginx/{{ vx_cloud_user }}.htpasswd;
 
-  root {{ vx_home }}/auto_scale/current/public;
+  root {{ vx_home }}/cloud/current/public;
 
   try_files $uri/index.html $uri.html $uri @app;
 
@@ -23,7 +23,7 @@ server {
 
     proxy_redirect off;
 
-    proxy_pass http://{{ vx_user}}_upstream;
+    proxy_pass http://{{ vx_cloud_user}}_upstream;
   }
 
   location ~ ^/assets/ {
@@ -42,6 +42,6 @@ server {
 
   error_page 500 502 503 504 /500.html;
   location = /500.html {
-    root {{ vx_home }}/auto_scale/current/public;
+    root {{ vx_home }}/cloud/current/public;
   }
 }

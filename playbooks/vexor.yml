@@ -20,15 +20,10 @@
   roles:
     - vexor/back_office
 
-- hosts: vexor-as
+- hosts: vexor-cloud
   roles:
-    - vexor/auto_scale
+    - vexor/cloud
 
 - hosts: vexor-worker
   roles:
     - vexor/worker
-
-- hosts: vexor-worker-rackspace
-  roles:
-    - { role: 'vexor/worker', vx_worker_disable_service: "true" }
-    - vexor/rackspace

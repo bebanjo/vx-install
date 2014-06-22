@@ -1,0 +1,121 @@
+- name: create user
+  user: >
+    name={{ vx_cloud_user }} comment="Vexor Cloud Worker"
+    createhome=false system=true home={{ vx_home }}/cloud
+
+- name: create postgresql database
+  tags: create_pg_database
+  sudo_user: postgres
+  postgresql_db: >
+    name={{ vx_db_name }}
+    encoding='UTF-8'
+    login_host=/var/run/postgresql
+  register: create_db_result
+
+- name: create postgresql user
+  sudo_user: postgres
+  postgresql_user: >
+    db={{ vx_db_name }}
+    name={{ vx_cloud_user }}
+    password={{ vx_db_password }}
+    priv=ALL
+    login_host=/var/run/postgresql
+
+- name: create htpasswd file for vhost
+  htpasswd: >
+    path=/etc/nginx/{{ vx_cloud_user }}.htpasswd
+    name={{ vx_cloud_user }}
+    password="{{ vx_cloud_password }}"
+    owner=root
+    group=nginx
+    mode=0640
+  notify: restart nginx service
+
+- name: create nginx vhost
+  template: src=nginx.j2 dest=/etc/nginx/conf.d/{{ vx_cloud_user }}.conf
+  notify: restart nginx service
+
+- name: install required packages
+  apt: pkg={{ item }}
+  with_items:
+    - "nodejs"
+    - "libpq-dev"
+    - "logrotate"
+
+- name: create working directories
+  file: dest={{ item }} state=directory owner={{ vx_cloud_user }}
+  with_items:
+    - "{{ vx_home }}/cloud"
+    - "{{ vx_home }}/cloud/releases"
+    - "{{ vx_home }}/cloud/shared"
+    - "{{ vx_home }}/cloud/shared/log"
+    - "{{ vx_home }}/cloud/shared/tmp"
+    - "{{ vx_home }}/cloud/shared/tmp/pids"
+    - "{{ vx_home }}/cloud/shared/config"
+    - "{{ vx_home }}/cloud/shared/private"
+  tags: deploy
+
+- name: create files
+  template: >
+    dest={{ item.dest }} src={{ item.src }}
+    owner={{ vx_cloud_user }} mode={{ item.mode }}
+  with_items:
+    - { dest: "{{ vx_etc_path}}/vxcloud.env", src: "env.j2", mode: "0600" }
+    - { dest: "{{ vx_home }}/cloud/deploy.rb", src: "deploy.j2", mode: "0644" }
+    - { dest: "{{ vx_home }}/cloud/shared/config/puma.rb", src: "puma.j2", mode: "0644" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_cloud_user }}-http", src: "vxcloud-http.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_cloud_user }}-consumer", src: "vxcloud-consumer.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_cloud_user }}-put", src: "vxcloud-put.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_cloud_user }}-sync", src: "vxcloud-sync.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_cloud_user }}-control", src: "vxcloud-control.j2", mode: "0755" }
+  register: create_result
+  tags: deploy
+
+- name: clone repo
+  git: >
+    repo="https://{{ vx_cloud_github_clone_token }}@github.com/vexor/vx-cloud.git"
+    dest={{ vx_home }}/cloud/scm version={{ vx_cloud_branch }}
+    update=true force=true bare=true
+  register: clone_result
+  sudo_user: "{{ vx_cloud_user }}"
+  environment:
+    GIT_SSL_NO_VERIFY: true
+  tags: deploy
+
+- name: is deploy exists
+  shell: >
+    test -f {{ vx_home }}/cloud/current/{{ clone_result.after }} && echo "yes" || echo "no"
+  register: is_deploy_exists_result
+  changed_when: "'no' in is_deploy_exists_result.stdout"
+  tags: deploy
+
+- name: run deploy
+  shell: >
+    {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/cloud
+  sudo_user: "{{ vx_cloud_user }}"
+  when: is_deploy_exists_result | changed or create_result | changed
+  tags: deploy
+  notify: restart vxcloud services
+
+- name: create upstart jobs
+  template: dest=/etc/init/{{ vx_cloud_user }}-{{ item }}.conf src={{ item }}.upstart.j2
+  with_items:
+    - "http"
+    - "consumer"
+    - "put"
+    - "sync"
+    - "control"
+  tags: deploy
+  notify: restart vxcloud services
+
+- name: ensure services up and running
+  service: name={{vx_cloud_user}}-{{ item }} enabled=yes state=started
+  with_items:
+    - "http"
+    - "consumer"
+    - "put"
+    - "sync"
+    - "control"
+
+- name: add logrotate script
+  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_cloud_user }}

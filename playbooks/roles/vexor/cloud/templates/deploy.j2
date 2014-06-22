@@ -2,15 +2,15 @@ require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
 
-set :deploy_to, "{{ vx_home }}/auto_scale"
+set :deploy_to, "{{ vx_home }}/cloud"
 
 set :domain, 'web.example.com'
-set :repository, 'git://github.com/vexor/vx-auto_scale.git'
-set :branch, '{{ vx_as_branch }}'
+set :repository, '{{ vx_home }}/cloud/scm'
+set :branch, '{{ vx_cloud_branch }}'
 
-set :user, '{{ vx_user }}'
+set :user, '{{ vx_cloud_user }}'
 
-set :shared_paths, ['log', 'config/puma.rb', 'tmp/pids', 'private']
+set :shared_paths, ['log', 'config/puma.rb', 'tmp/pids']
 
 task :environment do
   queue %{

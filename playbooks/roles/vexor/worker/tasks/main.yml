@@ -1,6 +1,11 @@
 - name: create docker group
   group: name=docker system=yes
 
+- name: pull docker image
+  action: shell docker pull {{ item }}
+  with_items:
+    - "{{ vx_worker_docker_image }}"
+
 - name: create user
   user: >
     name={{ vx_worker_user }} comment="Vexor Worker" groups=docker
@@ -40,7 +45,6 @@
     owner={{ vx_worker_user }} mode={{ item.mode }}
   with_items:
     - { dest: "/etc/init/{{ vx_worker_user }}.conf", src: "upstart.j2", mode: "0755" }
-  when: vx_worker_disable_service != 'true'
   register: upstart_result
   tags: deploy
 
@@ -58,6 +62,10 @@
   when: is_deploy_exists_result | changed or create_result | changed or upstart_result | changed
   notify: restart vxworker service
   tags: deploy
+
+- name: ensure services up and running
+  service: name={{ vx_worker_user }} enabled=yes state=started
+  when: vx_worker_service_autostart
 
 - name: add logrotate script
   template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_worker_user }} mode="0644" owner=root

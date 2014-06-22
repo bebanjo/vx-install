@@ -3,7 +3,7 @@
 require 'pathname'
 
 _num_workers = 2
-_working_dir = Pathname.new('{{ vx_home }}/auto_scale/current')
+_working_dir = Pathname.new('{{ vx_home }}/cloud/current')
 _rails_env   = 'production'
 
 directory _working_dir.to_s
@@ -15,7 +15,7 @@ daemonize false
 pidfile _working_dir.join("tmp/pids/puma.pid").to_s
 state_path _working_dir.join("tmp/pids/puma.state").to_s
 threads 0,16
-bind "tcp://127.0.0.1:3000"
+bind "tcp://127.0.0.1:3002"
 
 on_restart do
   puts 'On restart...'

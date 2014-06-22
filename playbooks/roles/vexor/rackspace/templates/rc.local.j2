@@ -1,7 +1,0 @@
-#!/bin/sh
-
-log=/var/log/vxworker-rx.log
-
-{{ vx_home }}/bin/worker-rx >> $log 2>&1
-/usr/sbin/rx_shutdown >> $log 2>&1
-

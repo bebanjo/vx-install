@@ -1,0 +1,22 @@
+vx_cloud_user: "vxcloud"
+vx_cloud_branch: "master"
+vx_cloud_password_file: "{{ credentials_dir }}/{{ vx_cloud_user }}.htpasswd"
+vx_cloud_password: "{{ lookup('password', vx_cloud_password_file + ' length=30 chars=numbers,digits') }}"
+vx_cloud_github_clone_token: "{{ lookup('env', 'GITHUB_CLONE_TOKEN') }}"
+
+vx_db_name: "{{ vx_cloud_user }}_production"
+vx_db_pool: 50
+vx_db_password_file: >
+  {{ credentials_dir }}/{{vx_cloud_user}}.postgres
+vx_db_password: >
+  {{ lookup('password', vx_db_password_file + ' length=30 chars=numbers,digits') }}
+vx_db_url: >
+  postgres://{{ vx_cloud_user }}:{{ vx_db_password }}@localhost/{{ vx_db_name }}?pool={{ vx_db_pool }}
+
+sdk_username: "{{ lookup('env', 'SDK_USERNAME') }}"
+sdk_token: "{{ lookup('env', 'SDK_TOKEN') }}"
+sdk_region: "{{ lookup('env', 'SDK_REGION') }}"
+
+aws_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+aws_secret: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+aws_key_name: "{{ lookup('env', 'AWS_KEY_NAME') }}"

@@ -1,6 +1,6 @@
 - name: restart vxworker service
   service: name={{ vx_worker_user }} state=restarted
-  ignore_errors: yes
+  when: vx_worker_service_autostart
 
 - name: restart logstash-forwarder service
   service: name=logstash-forwarder state=restarted

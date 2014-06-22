@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -x
+
+home={{ vx_home }}/worker
+user={{ vx_user }}
+command="{{ vx_home }}/bin/worker"
+
+start-stop-daemon -S -d $home -c $user:$user -g docker -x $command -- --once --once-min=50
+
+echo "DONE"

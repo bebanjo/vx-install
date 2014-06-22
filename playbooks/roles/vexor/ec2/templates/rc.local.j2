@@ -1,0 +1,7 @@
+#!/bin/sh
+
+log=/var/log/vxworker-ec2.log
+
+{{ vx_home }}/bin/worker-ec2 >> $log 2>&1
+/usr/sbin/ec2_shutdown >> $log 2>&1
+

@@ -2,17 +2,11 @@ github_key: "{{ lookup('env', 'GITHUB_KEY') }}"
 github_secret: "{{ lookup('env', 'GITHUB_SECRET') }}"
 github_restriction: "{{ lookup('env', 'GITHUB_RESTRICTION') }}"
 
-gitlab_url: "{{ lookup('env', 'GITLAB_URL') }}"
-
-airbrake_api_key: "{{ lookup('env', 'AIRBRAKE_API_KEY') }}"
-airbrake_host: "{{ lookup('env', 'AIRBRAKE_HOST') }}"
-
 vx_web_num_workers: "{{ ansible_processor_cores }}"
 vx_web_hostname: null
 vx_web_branch: "master"
 
 vx_worker_num_workers: "{{ ansible_processor_cores }}"
-vx_worker_docker_image: "dmexe/vexor-precise-full"
 vx_worker_branch: "master"
 
 logstash_server: ""

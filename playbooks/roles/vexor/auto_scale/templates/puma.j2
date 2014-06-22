@@ -1,0 +1,29 @@
+#!/usr/bin/env puma
+
+require 'pathname'
+
+_num_workers = 2
+_working_dir = Pathname.new('{{ vx_home }}/auto_scale/current')
+_rails_env   = 'production'
+
+directory _working_dir.to_s
+rackup _working_dir.join("config.ru").to_s
+environment _rails_env
+
+daemonize false
+
+pidfile _working_dir.join("tmp/pids/puma.pid").to_s
+state_path _working_dir.join("tmp/pids/puma.state").to_s
+threads 0,16
+bind "tcp://127.0.0.1:3000"
+
+on_restart do
+  puts 'On restart...'
+end
+
+workers _num_workers
+
+on_worker_boot do
+  puts 'On worker boot...'
+end
+

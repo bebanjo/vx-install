@@ -1,0 +1,7 @@
+---
+ec2_key: "{{ lookup('env', 'AWS_ACCESS_KEY') }}"
+ec2_secret: "{{ lookup('env', 'AWS_SECRET_KEY') }}"
+
+vx_user: "vxworker"
+vx_service: "vxworker"
+

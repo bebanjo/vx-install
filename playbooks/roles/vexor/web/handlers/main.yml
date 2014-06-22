@@ -4,6 +4,7 @@
   with_items:
     - { sv: "http", state: "reloaded" }
     - { sv: "consumer", state: "restarted" }
+    - { sv: "as-notifier", state: "restarted" }
 
 - name: restart logstash-forwarder service
   service: name=logstash-forwarder state=restarted

@@ -1,0 +1,6 @@
+---
+- hosts: vexor-worker-ec2
+  roles:
+    - { role: 'vexor/worker', vx_worker_disable_service: "true" }
+    - vexor/ec2
+

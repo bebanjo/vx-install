@@ -7,4 +7,4 @@
     repo="deb http://packages.erlang-solutions.com/debian {{ ansible_distribution_release }} contrib"
 
 - name: install erlang
-  apt: pkg="erlang-nox={{ erlang_version }}"
+  apt: pkg="erlang-nox={{ erlang_version }}" update_cache=yes

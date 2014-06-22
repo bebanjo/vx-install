@@ -12,11 +12,6 @@
     login_host=/var/run/postgresql
   register: create_db_result
 
-- name: create hstore extension in postgresql
-  sudo_user: postgres
-  shell: psql {{ vx_db_name }} -c "CREATE EXTENSION IF NOT EXISTS hstore;"
-  when: create_db_result | changed
-
 - name: create postgresql user
   sudo_user: postgres
   postgresql_user: >
@@ -24,7 +19,15 @@
     name={{ vx_user }}
     password={{ vx_db_password }}
     priv=ALL
+    role_attr_flags=CREATEDB,SUPERUSER,LOGIN
     login_host=/var/run/postgresql
+
+- name: upload ssl certificates
+  copy: src={{ item.l }} dest={{ item.r }} mode=0640 owner=nginx
+  with_items:
+    - { l: "{{ credentials_dir }}/vxweb.crt", r: "/etc/nginx/vxweb.crt" }
+    - { l: "{{ credentials_dir }}/vxweb.key", r: "/etc/nginx/vxweb.key" }
+  when: vx_web_use_ssl
 
 - name: create nginx vhost
   template: src=nginx.j2 dest=/etc/nginx/conf.d/{{ vx_user }}.conf
@@ -64,6 +67,7 @@
     - { dest: "{{ vx_home }}/web/shared/config/puma.rb", src: "puma.j2", mode: "0644" }
     - { dest: "{{ vx_home }}/bin/{{ vx_user }}-http", src: "vxweb-http.j2", mode: "0755" }
     - { dest: "{{ vx_home }}/bin/{{ vx_user }}-consumer", src: "vxweb-consumer.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_user }}-as-notifier", src: "vxweb-as-notifier.j2", mode: "0755" }
   register: create_result
   tags: deploy
 
@@ -98,6 +102,7 @@
   with_items:
     - "http"
     - "consumer"
+    - "as-notifier"
   tags: deploy
   notify: restart vxweb services
 

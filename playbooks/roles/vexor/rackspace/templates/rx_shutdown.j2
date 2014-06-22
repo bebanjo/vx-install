@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+set -x
+
+export PATH=$PATH:/usr/local/bin
+
+export OS_REGION_NAME={{ rx_region }}
+export OS_USERNAME={{ rx_user }}
+export OS_TENANT_NAME=none
+export OS_AUTH_SYSTEM=rackspace
+export OS_PASSWORD={{ rx_token }}
+
+export OS_AUTH_URL=https://identity.api.rackspacecloud.com/v2.0/
+
+nova credentials
+
+iid=$(xenstore-read name | sed -e 's/instance\-//')
+
+nova delete $iid

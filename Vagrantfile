@@ -5,14 +5,15 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = 'precise64'
 
-  config.vm.provider "virtualbox" do |vb|
-    vb.vm.box_url = 'http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box'
+  config.vm.provider "virtualbox" do |vb, override|
+    #vb.vm.box_url = 'http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box'
+    override.vx.box = "ubuntu/trusty64"
   end
 
   config.vm.provider "vmware_fusion" do |fs, override|
-    override.vm.box_url = 'http://files.vagrantup.com/precise64_vmware.box'
+    #override.vm.box_url = 'http://files.vagrantup.com/precise64_vmware.box'
+    override.vm.box = 'jpease/ubuntu-trusty'
   end
 
   %w{ mq web worker logger }.each_with_index do |name, idx|
@@ -33,5 +34,36 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
   end
+
+  sources = <<SOURCES
+#############################################################
+################### OFFICIAL UBUNTU REPOS ###################
+#############################################################
+
+###### Ubuntu Main Repos
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse
+
+###### Ubuntu Update Repos
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse
+SOURCES
+
+  script = <<SCRIPT
+set -e
+
+echo "---> Update /etc/apt/sources.list"
+
+cat > /etc/apt/sources.list <<EOL
+#{sources}
+EOL
+
+echo "---> Run apt-get update"
+apt-get update -qy > /dev/null
+SCRIPT
+
+  config.vm.provision "shell", inline: script
 end
 

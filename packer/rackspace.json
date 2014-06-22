@@ -1,0 +1,49 @@
+{
+  "builders": [
+    {
+      "type":         "openstack",
+      "ssh_username": "root",
+      "provider":     "rackspace-us",
+      "image_name":   "rx0.vexor.io {{timestamp}}",
+      "source_image": "bb02b1a3-bc77-4d17-ab5b-421d89850fca",
+      "flavor":       "performance1-4",
+      "region":       "ORD",
+
+      "openstack_provider": "rackspace"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "file",
+      "source": "./inventory",
+      "destination": "/tmp/provision"
+    },
+    {
+      "type": "file",
+      "source": "./credentials",
+      "destination": "/tmp/provision"
+    },
+    {
+      "type": "file",
+      "source": "./playbooks",
+      "destination": "/tmp/provision"
+    },
+    {
+      "environment_vars": [
+        "SDK_USERNAME={{user `sdk_username`}}",
+        "SDK_API_KEY={{user `sdk_api_key`}}",
+        "SDK_REGION={{user `sdk_region`}}"
+      ],
+      "script": "packer/rackspace.sh",
+      "type": "shell"
+    }
+  ],
+
+  "variables": {
+    "sdk_username": "{{env `SDK_USERNAME`}}",
+    "sdk_api_key": "{{env `SDK_API_KEY`}}",
+    "sdk_region": "{{env `SDK_REGION`}}"
+  }
+}
+

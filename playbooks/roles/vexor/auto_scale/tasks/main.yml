@@ -1,0 +1,122 @@
+- name: create user
+  user: >
+    name={{ vx_user }} comment="Vexor AutoScale Worker"
+    createhome=false system=true home={{ vx_home }}/auto_scale
+
+- name: create postgresql database
+  tags: create_pg_database
+  sudo_user: postgres
+  postgresql_db: >
+    name={{ vx_db_name }}
+    encoding='UTF-8'
+    login_host=/var/run/postgresql
+  register: create_db_result
+
+- name: create postgresql user
+  sudo_user: postgres
+  postgresql_user: >
+    db={{ vx_db_name }}
+    name={{ vx_user }}
+    password={{ vx_db_password }}
+    priv=ALL
+    login_host=/var/run/postgresql
+
+- name: create htpasswd file for vhost
+  htpasswd: >
+    path=/etc/nginx/{{ vx_user }}.htpasswd
+    name={{ vx_user }}
+    password="{{ vx_as_password }}"
+    owner=root
+    group=nginx
+    mode=0640
+  notify: restart nginx service
+
+- name: create nginx vhost
+  template: src=nginx.j2 dest=/etc/nginx/conf.d/{{ vx_user }}.conf
+  notify: restart nginx service
+
+- name: remove default nginx site
+  file: dest=/etc/nginx/conf.d/default.conf state=absent
+  notify: restart nginx service
+
+- name: install required packages
+  apt: pkg={{ item }}
+  with_items:
+    - "nodejs"
+    - "libpq-dev"
+    - "logrotate"
+
+- name: create working directories
+  file: dest={{ item }} state=directory owner={{ vx_user }}
+  with_items:
+    - "{{ vx_home }}/auto_scale"
+    - "{{ vx_home }}/auto_scale/releases"
+    - "{{ vx_home }}/auto_scale/shared"
+    - "{{ vx_home }}/auto_scale/shared/log"
+    - "{{ vx_home }}/auto_scale/shared/tmp"
+    - "{{ vx_home }}/auto_scale/shared/tmp/pids"
+    - "{{ vx_home }}/auto_scale/shared/config"
+    - "{{ vx_home }}/auto_scale/shared/private"
+  tags: deploy
+
+- name: create files
+  template: >
+    dest={{ item.dest }} src={{ item.src }}
+    owner={{ vx_user }} mode={{ item.mode }}
+  with_items:
+    - { dest: "{{ vx_etc_path}}/Envfile", src: "Envfile.j2", mode: "0600" }
+    - { dest: "{{ vx_home }}/auto_scale/deploy.rb", src: "deploy.j2", mode: "0644" }
+    - { dest: "{{ vx_home }}/auto_scale/shared/config/puma.rb", src: "puma.j2", mode: "0644" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_user }}-http", src: "vxas-http.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_user }}-consumer", src: "vxas-consumer.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_user }}-put", src: "vxas-put.j2", mode: "0755" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_user }}-sync", src: "vxas-sync.j2", mode: "0755" }
+  register: create_result
+  tags: deploy
+
+- name: clone repo
+  git: >
+    repo="https://github.com/vexor/vx-auto_scale.git"
+    dest={{ vx_home }}/auto_scale/scm version={{ vx_as_branch }}
+    update=true force=true bare=true
+  register: clone_result
+  sudo_user: "{{ vx_user }}"
+  environment:
+    GIT_SSL_NO_VERIFY: true
+  tags: deploy
+
+- name: is deploy exists
+  shell: >
+    test -f {{ vx_home }}/auto_scale/current/{{ clone_result.after }} && echo "yes" || echo "no"
+  register: is_deploy_exists_result
+  changed_when: "'no' in is_deploy_exists_result.stdout"
+  tags: deploy
+
+- name: run deploy
+  shell: >
+    {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/auto_scale
+  sudo_user: "{{ vx_user }}"
+  when: is_deploy_exists_result | changed or create_result | changed
+  tags: deploy
+  notify: restart vxas services
+
+- name: create upstart jobs
+  template: dest=/etc/init/{{ vx_user }}-{{ item }}.conf src={{ item }}.upstart.j2
+  with_items:
+    - "http"
+    - "consumer"
+    - "put"
+    - "sync"
+  tags: deploy
+  notify: restart vxas services
+
+- name: ensure services up and running
+  service: name={{vx_user}}-{{ item }} enabled=yes state=started
+  with_items:
+    - "http"
+    - "consumer"
+    - "put"
+    - "sync"
+
+- name: add logrotate script
+  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_user }}

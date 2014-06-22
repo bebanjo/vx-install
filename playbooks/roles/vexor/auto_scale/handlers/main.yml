@@ -1,0 +1,8 @@
+- name: restart vxas services
+  tags: fail_on_ci
+  service: name={{ vx_user }}-{{ item.sv }} state={{ item.state }}
+  with_items:
+    - { sv: "http", state: "reloaded" }
+    - { sv: "consumer", state: "restarted" }
+    - { sv: "put", state: "restarted" }
+    - { sv: "sync", state: "restarted" }

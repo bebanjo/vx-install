@@ -30,9 +30,18 @@
   with_items:
     - { dest: "{{ vx_home}}/bin/worker", src: "worker.j2", mode: "0755" }
     - { dest: "{{ vx_etc_path}}/Envfile", src: "env.j2", mode: "0600" }
-    - { dest: "/etc/init/{{ vx_service }}.conf", src: "upstart.j2", mode: "0755" }
     - { dest: "{{ vx_home }}/worker/deploy.rb", src: "deploy.rb", mode: "0644" }
   register: create_result
+  tags: deploy
+
+- name: create upstart job
+  template: >
+    dest={{ item.dest }} src={{ item.src }}
+    owner={{ vx_user }} mode={{ item.mode }}
+  with_items:
+    - { dest: "/etc/init/{{ vx_service }}.conf", src: "upstart.j2", mode: "0755" }
+  when: vx_worker_disable_service != 'true'
+  register: upstart_result
   tags: deploy
 
 - name: is deploy exists
@@ -46,7 +55,7 @@
   shell: >
     {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/worker
   sudo_user: "{{ vx_user }}"
-  when: is_deploy_exists_result | changed or create_result | changed
+  when: is_deploy_exists_result | changed or create_result | changed or upstart_result | changed
   notify: restart vxworker service
   tags: deploy
 

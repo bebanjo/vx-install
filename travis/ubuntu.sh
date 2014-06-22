@@ -69,6 +69,7 @@ install_packages () {
 run_debootstrap () {
   notice "run debootstrap in $IMAGE"
   sudo debootstrap --include="openssh-server,python" $DIST $IMAGE >> $LOG
+  sudo mkdir -p $IMAGE/tmp
 }
 
 setup_apt_sources () {

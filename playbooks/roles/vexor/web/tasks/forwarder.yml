@@ -1,4 +1,5 @@
 - name: install logstash-forwarder package
+  tags: logstash
   apt: pkg={{ item }}
   with_items:
     - logstash-forwarder
@@ -12,8 +13,10 @@
   notify: restart logstash-forwarder service
 
 - name: create logstash-forwarder configuration file
+  tags: logstash
   template: src=forwarder.j2 dest=/etc/logstash-forwarder/logstash-forwarder.conf
   notify: restart logstash-forwarder service
 
 - name: ensure logstash-forwarder service up and running
+  tags: logstash
   service: name=logstash-forwarder state=running enabled=yes

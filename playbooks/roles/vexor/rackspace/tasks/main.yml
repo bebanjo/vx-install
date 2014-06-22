@@ -1,0 +1,24 @@
+- name: install required packages
+  apt: pkg=python-pip
+
+- name: install novaclient
+  pip: name=rackspace-novaclient
+
+- name: pull docker image
+  action: shell docker pull {{ item }}
+  with_items:
+    - "dmexe/vexor-trusty-full"
+
+- name: create rx_shutdown
+  template: src=rx_shutdown.j2 dest=/usr/sbin/rx_shutdown mode=0755
+
+- name: create files
+  template: >
+    dest={{ item.dest }} src={{ item.src }} mode={{ item.mode }}
+  with_items:
+    - { dest: "{{ vx_home }}/bin/worker-rx", src: "worker-rx.j2", mode: "0755" }
+    - { dest: "/etc/rc.local", src: "rc.local.j2", mode: "0755" }
+
+- name: sync
+  shell: >
+    sync && sync && sync

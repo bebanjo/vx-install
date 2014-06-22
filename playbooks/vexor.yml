@@ -1,6 +1,5 @@
 ---
-- hosts: vexor
-  vars:
+- hosts: all
 
 - hosts: vexor-mq
   roles:
@@ -16,7 +15,16 @@
   roles:
     - vexor/web
 
+- hosts: vexor-as
+  roles:
+    - vexor/auto_scale
+
 - hosts: vexor-worker
   roles:
     - vexor/worker
+
+- hosts: vexor-worker-rackspace
+  roles:
+    - { role: 'vexor/worker', vx_worker_disable_service: "true" }
+    - vexor/rackspace
 

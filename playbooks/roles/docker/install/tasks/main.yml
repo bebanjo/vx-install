@@ -9,10 +9,6 @@
   apt: pkg=linux-image-extra-{{ ansible_kernel }}
   when: ansible_distribution_version != '12.04'
 
-- name: install lxc package
-  tags: docker
-  apt: pkg=lxc
-
 - name: install docker package
   tags: docker
   apt: pkg=lxc-docker-{{ docker_version }}
@@ -21,3 +17,6 @@
   template: src=docker.j2 dest=/etc/default/docker
   notify:
     - restart docker service
+
+- name: flush handlers
+  meta: flush_handlers

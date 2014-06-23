@@ -3,12 +3,13 @@
     name={{ vx_web_user }} comment="Vexor Web Worker"
     createhome=false system=true home={{ vx_home }}/web
 
-- name: upload ssl certificates
-  copy: src={{ item.l }} dest={{ item.r }} mode=0640 owner=nginx
-  with_items:
-    - { l: "{{ credentials_dir }}/vxweb.crt", r: "/etc/nginx/{{vx_web_user }}.crt" }
-    - { l: "{{ credentials_dir }}/vxweb.key", r: "/etc/nginx/{{vx_web_user}}.key" }
-  when: vx_web_use_ssl
+# FIXME use the vexor defaults for ssl instead our owns
+#- name: upload ssl certificates
+#  copy: src={{ item.l }} dest={{ item.r }} mode=0640 owner=nginx
+#  with_items:
+#    - { l: "{{ credentials_dir }}/vxweb.crt", r: "/etc/nginx/{{vx_web_user }}.crt" }
+#    - { l: "{{ credentials_dir }}/vxweb.key", r: "/etc/nginx/{{vx_web_user}}.key" }
+#  when: vx_web_use_ssl
 
 - name: create nginx vhost
   template: src=nginx.j2 dest=/etc/nginx/conf.d/{{ vx_web_user }}.conf

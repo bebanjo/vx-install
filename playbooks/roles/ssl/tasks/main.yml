@@ -18,3 +18,4 @@
     - server.key
     - server.crt
     - caauthority.crt
+  when: vx_web_use_ssl

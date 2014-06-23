@@ -7,9 +7,6 @@ server {
   listen 443 ssl;
   server_name {{ vx_web_hostname }};
 
-  ssl_certificate /etc/ssl/certs/{{ company_name }}/bundle.crt;
-  ssl_certificate_key /etc/ssl/certs/{{ company_name }}/server.key;
-
   rewrite ^ https://$host$request_uri? permanent;
 }
 {% endif %}
@@ -20,8 +17,8 @@ server {
   {% if vx_web_use_ssl %}
     listen 443;
     ssl                  on;
-    ssl_certificate      /etc/nginx/vxweb.crt;
-    ssl_certificate_key  /etc/nginx/vxweb.key;
+    ssl_certificate      /etc/ssl/certs/{{ company_name }}/bundle.crt;
+    ssl_certificate_key  /etc/ssl/certs/{{ company_name }}/server.key;
     ssl_session_timeout  30m;
   {% else %}
     listen 80;

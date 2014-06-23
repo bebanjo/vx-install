@@ -1,0 +1,12 @@
+vx_back_office_user: "vxbackoffice"
+vx_back_office_branch: "master"
+
+vx_back_office_github_key: null
+vx_back_office_github_secret: null
+
+vx_back_office_secret_file: >
+  {{ credentials_dir }}/{{vx_back_office_user}}.rails.secret
+vx_back_office_secret: >
+  {{ lookup('password', vx_back_office_secret_file + ' length=128 chars=ascii_letters,digits') }}
+
+vx_back_office_github_clone_token: "{{ lookup('env', 'GITHUB_CLONE_TOKEN') }}"

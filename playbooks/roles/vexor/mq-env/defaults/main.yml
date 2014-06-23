@@ -6,5 +6,7 @@ vx_mq_password_file: >
   {{ credentials_dir }}/{{vx_mq_user}}.rabbitmq
 vx_mq_password: >
   {{ lookup('password', vx_mq_password_file + ' length=30 chars=numbers,digits') }}
+vx_mq_force_user: "no"
 rabbitmq_url: >
   amqp://{{ vx_mq_user }}:{{ vx_mq_password }}@{{ vx_mq_host }}/{{ vx_mq_vhost }}
+

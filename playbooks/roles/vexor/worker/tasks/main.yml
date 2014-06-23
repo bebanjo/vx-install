@@ -1,19 +1,24 @@
 - name: create docker group
   group: name=docker system=yes
 
+- name: pull docker image
+  action: shell docker pull {{ item }}
+  with_items:
+    - "{{ vx_worker_docker_image }}"
+
 - name: create user
   user: >
-    name={{ vx_user }} comment="Vexor Worker" groups=docker uid={{ vx_worker_user_uid }}
+    name={{ vx_worker_user }} comment="Vexor Worker" groups=docker uid={{ vx_worker_user_uid }}
     createhome=false system=true home={{ vx_home }}/worker
 
 - name: create working directories
-  file: dest={{ item }} state=directory owner={{ vx_user }}
+  file: dest={{ item }} state=directory owner={{ vx_worker_user }}
   with_items:
     - "{{ vx_home }}/worker"
     - "{{ vx_home }}/worker/releases"
 
 - name: clone repo
-  sudo_user: "{{ vx_user }}"
+  sudo_user: "{{ vx_worker_user }}"
   git: >
     repo="https://github.com/{{ vx_worker_repo }}.git"
     dest={{ vx_home }}/worker/scm version={{ vx_worker_branch }}
@@ -26,13 +31,21 @@
 - name: create files
   template: >
     dest={{ item.dest }} src={{ item.src }}
-    owner={{ vx_user }} mode={{ item.mode }}
+    owner={{ vx_worker_user }} mode={{ item.mode }}
   with_items:
     - { dest: "{{ vx_home}}/bin/worker", src: "worker.j2", mode: "0755" }
-    - { dest: "{{ vx_etc_path}}/Envfile", src: "env.j2", mode: "0600" }
-    - { dest: "/etc/init/{{ vx_service }}.conf", src: "upstart.j2", mode: "0755" }
+    - { dest: "{{ vx_etc_path}}/vxworker.env", src: "env.j2", mode: "0600" }
     - { dest: "{{ vx_home }}/worker/deploy.rb", src: "deploy.rb", mode: "0644" }
   register: create_result
+  tags: deploy
+
+- name: create upstart job
+  template: >
+    dest={{ item.dest }} src={{ item.src }}
+    owner={{ vx_worker_user }} mode={{ item.mode }}
+  with_items:
+    - { dest: "/etc/init/{{ vx_worker_user }}.conf", src: "upstart.j2", mode: "0755" }
+  register: upstart_result
   tags: deploy
 
 - name: is deploy exists
@@ -45,13 +58,17 @@
 - name: run deploy
   shell: >
     {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/worker
-  sudo_user: "{{  vx_user }}"
-  when: is_deploy_exists_result | changed or create_result | changed
+  sudo_user: "{{ vx_worker_user }}"
+  when: is_deploy_exists_result | changed or create_result | changed or upstart_result | changed
   notify: restart vxworker service
   tags: deploy
 
+- name: ensure services up and running
+  service: name={{ vx_worker_user }} enabled=yes state=started
+  when: vx_worker_service_autostart
+
 - name: add logrotate script
-  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_user }} mode="0644" owner=root
+  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_worker_user }} mode="0644" owner=root
 
 - include: forwarder.yml
   tags: forwarder

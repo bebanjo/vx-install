@@ -1,3 +1,4 @@
 ---
 dependencies:
   - { role: vexor/mq-env }
+  - { role: vexor/db-env }

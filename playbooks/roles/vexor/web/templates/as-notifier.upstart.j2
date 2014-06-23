@@ -1,0 +1,21 @@
+description "start and stop the vexor as daemon"
+version "1.0"
+
+start on filesystem or runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+console log
+
+setuid {{ vx_web_user }}
+setgid {{ vx_web_user }}
+
+script
+  home={{ vx_home }}/web/current
+  user={{ vx_web_user }}
+  command="{{ vx_home }}/bin/{{ vx_web_user }}-as-notifier"
+
+  chdir $home
+  exec $command
+end script
+

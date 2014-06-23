@@ -2,7 +2,7 @@
   tags: kibana
   git: >
     repo="https://github.com/elasticsearch/kibana.git"
-    dest=/opt/kibana version=HEAD
+    dest=/opt/kibana version={{ kibana_version }}
     update=true force=true
   register: checkout_result
 

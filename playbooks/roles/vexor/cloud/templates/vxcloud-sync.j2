@@ -1,0 +1,10 @@
+#!/bin/sh
+
+export PATH={{ vx_home }}/bin:$PATH
+export STDOUT_LOGGER=1
+export RAILS_ENV=production
+
+chdir {{ vx_home }}/cloud/current
+
+exec {{ vx_bundle }} exec bin/cloud-sync
+

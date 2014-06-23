@@ -19,6 +19,14 @@ vexor-logger
 [vexor:vars]
 ansible_ssh_user=vagrant
 ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
-vx_worker_num_workers=2
 
 logstash_server=192.168.47.13:5043
+rabbitmq_remove_guest=False
+postgres_listen="*"
+
+vx_mq_vhost=/
+vx_mq_user=guest
+vx_mq_password=guest
+vx_mq_force_user=yes
+
+vx_worker_num_workers=2

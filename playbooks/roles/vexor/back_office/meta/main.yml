@@ -1,0 +1,7 @@
+---
+dependencies:
+  - { role: nginx/install }
+  - { role: nodejs/install }
+  - { role: vexor/common }
+  - { role: vexor/deploy }
+  - { role: vexor/db-env }

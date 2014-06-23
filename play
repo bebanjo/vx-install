@@ -6,7 +6,8 @@ first=$1
 rest=${*:2}
 
 function play() {
-  ansible-playbook $rest -i inventory/$1 --sudo playbooks/site.yml
+  # Ask the sudo password for the online servers
+  ansible-playbook $rest -i inventory/$1 playbooks/site.yml --sudo -K
 }
 
 test -f inventory/$1 || echo "Usage $0 (vagrant|testing|production) [options]"

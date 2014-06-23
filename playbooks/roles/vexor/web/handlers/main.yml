@@ -1,9 +1,10 @@
 - name: restart vxweb services
   tags: fail_on_ci
-  service: name={{ vx_user }}-{{ item.sv }} state={{ item.state }}
+  service: name={{ vx_web_user }}-{{ item.sv }} state={{ item.state }}
   with_items:
     - { sv: "http", state: "reloaded" }
     - { sv: "consumer", state: "restarted" }
+    - { sv: "as-notifier", state: "restarted" }
 
 - name: restart logstash-forwarder service
   service: name=logstash-forwarder state=restarted

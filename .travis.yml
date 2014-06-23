@@ -1,5 +1,7 @@
 language: c
 
+cache: false
+
 env:
   matrix:
     - "DIST=precise"

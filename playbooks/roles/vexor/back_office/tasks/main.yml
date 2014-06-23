@@ -1,0 +1,87 @@
+- name: create user
+  user: >
+    name={{ vx_back_office_user }} comment="Vexor BackOffice"
+    createhome=false system=true home={{ vx_home }}/back_office
+
+- name: create nginx vhost
+  template: src=nginx.j2 dest=/etc/nginx/conf.d/{{ vx_back_office_user }}.conf
+  notify: restart nginx service
+
+- name: install required packages
+  apt: pkg={{ item }}
+  with_items:
+    - "nodejs"
+    - "libpq-dev"
+    - "logrotate"
+
+- name: create working directories
+  file: dest={{ item }} state=directory owner={{ vx_back_office_user }}
+  with_items:
+    - "{{ vx_home }}/back_office"
+    - "{{ vx_home }}/back_office/releases"
+    - "{{ vx_home }}/back_office/shared"
+    - "{{ vx_home }}/back_office/shared/log"
+    - "{{ vx_home }}/back_office/shared/tmp"
+    - "{{ vx_home }}/back_office/shared/tmp/pids"
+    - "{{ vx_home }}/back_office/shared/config"
+  tags:
+    - backoffice-deploy
+
+- name: create files
+  template: >
+    dest={{ item.dest }} src={{ item.src }}
+    owner={{ vx_back_office_user }} mode={{ item.mode }}
+  with_items:
+    - { dest: "{{ vx_etc_path}}/vxbackoffice.env", src: "env.j2", mode: "0600" }
+    - { dest: "{{ vx_home }}/back_office/deploy.rb", src: "deploy.j2", mode: "0644" }
+    - { dest: "{{ vx_home }}/back_office/shared/config/puma.rb", src: "puma.j2", mode: "0644" }
+    - { dest: "{{ vx_home }}/bin/{{ vx_back_office_user }}-http", src: "vxbackoffice-http.j2", mode: "0755" }
+  register: create_result
+  tags:
+    - backoffice-deploy
+
+- name: clone repo
+  sudo_user: "{{ vx_back_office_user }}"
+  git: >
+    repo="https://{{vx_back_office_github_clone_token}}@github.com/vexor/vx-backoffice.git"
+    dest={{ vx_home }}/back_office/scm version={{ vx_back_office_branch }}
+    update=true force=true bare=true accept_hostkey=true
+  register: clone_result
+  environment:
+    GIT_SSL_NO_VERIFY: true
+  tags:
+    - backoffice-deploy
+
+- name: is deploy exists
+  shell: >
+    test -f {{ vx_home }}/back_office/current/{{ clone_result.after }} && echo "yes" || echo "no"
+  register: is_deploy_exists_result
+  changed_when: "'no' in is_deploy_exists_result.stdout"
+  tags:
+    - backoffice-deploy
+
+- name: run deploy
+  sudo_user: "{{ vx_back_office_user }}"
+  shell: >
+    {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/back_office
+  when: is_deploy_exists_result | changed or create_result | changed
+  notify: restart vxbackoffice services
+  tags:
+    - backoffice-deploy
+
+- name: create upstart jobs
+  template: dest=/etc/init/{{ vx_back_office_user }}-{{ item }}.conf src={{ item }}.upstart.j2
+  with_items:
+    - "http"
+  notify: restart vxbackoffice services
+  tags:
+    - backoffice-deploy
+
+- name: ensure services up and running
+  service: name={{vx_back_office_user}}-{{ item }} enabled=yes state=started
+  with_items:
+    - "http"
+
+- name: add logrotate script
+  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_back_office_user }}
+

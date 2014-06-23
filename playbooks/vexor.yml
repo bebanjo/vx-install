@@ -1,4 +1,6 @@
 ---
+- hosts: all
+
 - hosts: vexor
   sudo: true
   vars:
@@ -15,7 +17,16 @@
 
 - hosts: vexor-web
   roles:
+    - vexor/db
     - vexor/web
+
+- hosts: vexor-backoffice
+  roles:
+    - vexor/back_office
+
+- hosts: vexor-cloud
+  roles:
+    - vexor/cloud
 
 - hosts: vexor-worker
   roles:
@@ -24,4 +35,3 @@
 - hosts: vexor-registry
   roles:
     - vexor/registry
-

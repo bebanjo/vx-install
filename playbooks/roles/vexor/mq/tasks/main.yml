@@ -1,3 +1,9 @@
+- name: create rabbitmq plugins
+  rabbitmq_plugin: names={{ vx_mq_plugins }}
+  environment:
+    PATH: /bin:/usr/bin:/usr/lib/rabbitmq/bin
+  notify: restart rabbitmq service
+
 - name: create rabbitmq vhost
   rabbitmq_vhost: name={{ vx_mq_vhost }}
 
@@ -10,12 +16,7 @@
     read_priv=".*"
     write_priv=".*"
     tags="monitoring"
-
-- name: create rabbitmq plugins
-  rabbitmq_plugin: names={{ vx_mq_plugins }}
-  environment:
-    PATH: /bin:/usr/bin:/usr/lib/rabbitmq/bin
-  notify: restart rabbitmq service
+    force="{{ vx_mq_force_user }}"
 
 - name: ensure service up and running
   service: name=rabbitmq-server state=started enabled=yes

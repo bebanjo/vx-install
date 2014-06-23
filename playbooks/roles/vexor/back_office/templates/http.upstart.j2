@@ -1,0 +1,22 @@
+description "start and stop the vexor backoffice http daemon"
+version "1.0"
+
+start on filesystem or runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+console log
+
+setuid {{ vx_back_office_user }}
+setgid {{ vx_back_office_user }}
+
+script
+  home={{ vx_home }}/back_office/current
+  user={{ vx_back_office_user }}
+  command="{{ vx_home }}/bin/{{ vx_back_office_user }}-http"
+
+  chdir $home
+  exec $command
+end script
+
+

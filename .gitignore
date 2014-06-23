@@ -1,5 +1,8 @@
 .vagrant
 .env
 inventory/production
+inventory/production.new
 credentials/
 packer/
+*.pem
+/vendor/

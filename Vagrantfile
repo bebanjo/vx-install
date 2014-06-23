@@ -5,17 +5,25 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = 'precise64'
+<<<<<<< Updated upstream
+
+  config.vm.provider "virtualbox" do |vb, override|
+    #vb.vm.box_url = 'http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box'
+    override.vx.box = "ubuntu/trusty64"
+=======
+  config.vm.box = 'trusty64'
 
   config.vm.provider "virtualbox" do |vb|
-    vb.vm.box_url = 'http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box'
+    vb.vm.box_url = 'https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box'
+>>>>>>> Stashed changes
   end
 
   config.vm.provider "vmware_fusion" do |fs, override|
-    override.vm.box_url = 'http://files.vagrantup.com/precise64_vmware.box'
+    #override.vm.box_url = 'http://files.vagrantup.com/precise64_vmware.box'
+    override.vm.box = 'jpease/ubuntu-trusty'
   end
 
-  %w{ mq web worker logger }.each_with_index do |name, idx|
+  %w{ mq-web worker }.each_with_index do |name, idx|
     config.vm.define name.to_sym do |s|
       ip = "192.168.47.#{idx + 10}"
       s.vm.network :private_network, ip: ip
@@ -25,13 +33,47 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       when  "worker"
         s.vm.network :forwarded_port, guest: 4243, host: 4243 # docker
         s.vm.network :forwarded_port, guest: 2022, host: 2122 # docker
-      when  "web"
+      when  "mq-web"
+        # web
         s.vm.network :forwarded_port, guest: 5432, host: 5432 # pg
-      when "mq"
+        # mq
         s.vm.network :forwarded_port, guest: 5672, host: 5672 # amqp
         s.vm.network :forwarded_port, guest: 15672, host: 15672 # amqp ui
+      when "logger"
+        s.vm.network :forwarded_port, guest: 9200, host: 9200 # elasticsearch
       end
     end
   end
+
+  sources = <<SOURCES
+#############################################################
+################### OFFICIAL UBUNTU REPOS ###################
+#############################################################
+
+###### Ubuntu Main Repos
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse
+
+###### Ubuntu Update Repos
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse
+deb mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty-security main restricted universe multiverse
+deb-src mirror://mirrors.ubuntu.com/mirrors.txt trusty-updates main restricted universe multiverse
+SOURCES
+
+  script = <<SCRIPT
+set -e
+
+echo "---> Update /etc/apt/sources.list"
+
+cat > /etc/apt/sources.list <<EOL
+#{sources}
+EOL
+
+echo "---> Run apt-get update"
+apt-get update -qy > /dev/null
+SCRIPT
+
+  config.vm.provision "shell", inline: script
 end
 

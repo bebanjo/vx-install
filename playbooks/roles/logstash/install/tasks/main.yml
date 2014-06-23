@@ -1,3 +1,6 @@
+- name: install required packages
+  apt: pkg=git-core
+
 - name: create logstash user
   user: >
     name=logstash comment="logstash daemon"
@@ -9,17 +12,18 @@
     - "{{ logstash_root }}"
     - "{{ logstash_root }}/config"
 
-- name: download package
-  get_url: >
-    url={{ logstash_download_url }}
-    dest={{ logstash_root }}/logstash.jar
+- name: download and unpack package
+  shell: >
+    curl -s {{ logstash_download_url }} | tar -zxf -
+    chdir=/opt
+    creates={{ logstash_root }}/bin/logstash
 
 - name: generate ssl serificate for forwarder
   sudo: false
   connection: local
   shell: >
     mkdir -p $(dirname {{ item[0] }}) &&
-    openssl req -x509 -batch -nodes -newkey rsa:2048 -keyout {{ item[1] }} -out {{ item[0] }}
+    openssl req -x509 -batch -nodes -newkey rsa:2048 -days 1095 -keyout {{ item[1] }} -out {{ item[0] }}
     creates={{ item[0] }}
   with_nested:
     - "{{ credentials_dir }}/logstash/forwarder.crt"

@@ -1,0 +1,41 @@
+require 'mina/bundler'
+require 'mina/rails'
+require 'mina/git'
+
+set :deploy_to, "{{ vx_home }}/back_office"
+
+set :domain, 'web.example.com'
+set :repository, '{{ vx_home }}/back_office/scm'
+set :branch, '{{ vx_back_office_branch }}'
+
+set :user, '{{ vx_back_office_user }}'
+
+set :shared_paths, ['log', 'config/puma.rb', 'tmp/pids', 'private']
+
+task :environment do
+  queue %{
+    echo "-----> Run at $(date)"
+    #{ echo_cmd %{export PATH={{ vx_home }}/bin:$PATH} }
+  }
+end
+
+task :setup => :environment do
+  queue %[mkdir -p "#{deploy_to}/shared/log"]
+  queue %[chmod g+rx,u+rwx "#{deploy_to}/shared/log"]
+end
+
+desc "Deploys the current version to the server."
+task :deploy => :setup do
+  deploy do
+    invoke :'git:clone'
+    invoke :'deploy:link_shared_paths'
+    invoke :'bundle:install'
+
+    invoke :'rails:assets_precompile'
+
+    to :launch do
+      invoke :'deploy:cleanup'
+    end
+  end
+end
+

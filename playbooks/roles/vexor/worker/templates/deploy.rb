@@ -4,10 +4,10 @@ require 'mina/git'
 set :deploy_to, "{{ vx_home }}/worker"
 
 set :domain, 'worker.example.com'
-set :repository, 'git://github.com/{{ vx_worker_repo }}.git'
+set :repository, '{{ vx_home }}/worker/scm'
 set :branch, '{{ vx_worker_branch }}'
 
-set :user, '{{ vx_user }}'
+set :user, '{{ vx_worker_user }}'
 
 set :shared_paths, ['log']
 
@@ -28,7 +28,7 @@ task :deploy => :setup do
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     queue %{
-      bundle install --path=#{deploy_to}/shared/bundle --without test --jobs 4
+      bundle install --path=#{deploy_to}/shared/bundle --without test
     }
     to :launch do
       invoke :'deploy:cleanup'

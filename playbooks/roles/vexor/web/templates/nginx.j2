@@ -1,13 +1,31 @@
-upstream {{ vx_user }}_upstream {
+upstream {{ vx_web_user }}_upstream {
   server 127.0.0.1:3000;
 }
 
+{% if vx_web_use_ssl %}
 server {
   listen 443 ssl;
   server_name {{ vx_web_hostname }};
 
   ssl_certificate /etc/ssl/certs/{{ company_name }}/bundle.crt;
   ssl_certificate_key /etc/ssl/certs/{{ company_name }}/server.key;
+
+  rewrite ^ https://$host$request_uri? permanent;
+}
+{% endif %}
+
+server {
+  server_name _;
+
+  {% if vx_web_use_ssl %}
+    listen 443;
+    ssl                  on;
+    ssl_certificate      /etc/nginx/vxweb.crt;
+    ssl_certificate_key  /etc/nginx/vxweb.key;
+    ssl_session_timeout  30m;
+  {% else %}
+    listen 80;
+  {% endif %}
 
   client_max_body_size 4G;
   keepalive_timeout 5;
@@ -26,7 +44,7 @@ server {
 
     proxy_redirect off;
 
-    proxy_pass http://{{ vx_user}}_upstream;
+    proxy_pass http://{{ vx_web_user}}_upstream;
   }
 
   location ~ ^/api/events {
@@ -40,7 +58,7 @@ server {
     proxy_buffering off;
     proxy_cache off;
 
-    proxy_pass http://{{ vx_user }}_upstream;
+    proxy_pass http://{{ vx_web_user }}_upstream;
   }
 
   location ~ ^/assets/ {

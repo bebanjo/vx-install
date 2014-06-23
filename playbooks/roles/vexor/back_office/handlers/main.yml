@@ -1,0 +1,4 @@
+- name: restart vxbackoffice services
+  service: name={{ vx_back_office_user }}-{{ item.sv }} state={{ item.state }}
+  with_items:
+    - { sv: "http", state: "reloaded" }

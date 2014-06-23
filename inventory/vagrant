@@ -30,3 +30,4 @@ vx_mq_password=guest
 vx_mq_force_user=yes
 
 vx_worker_num_workers=2
+vx_worker_pull_image=False

@@ -3,6 +3,7 @@
 
 - name: pull docker image
   action: shell docker pull {{ item }}
+  when: vx_worker_pull_image
   with_items:
     - "{{ vx_worker_docker_image }}"
 

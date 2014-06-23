@@ -2,7 +2,6 @@ vx_web_user: "vxweb"
 
 vx_web_num_workers: "{{ ansible_processor_cores }}"
 vx_web_hostname: null
-vx_Web_scheme: "http"
 vx_web_branch: "master"
 vx_web_signup: False
 vx_web_use_ssl: False

@@ -6,3 +6,4 @@ credentials/
 packer/
 *.pem
 /vendor/
+/ci/testing

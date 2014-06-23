@@ -4,3 +4,4 @@
 
 - name: restart logstash-forwarder service
   service: name=logstash-forwarder state=restarted
+  when: vx_worker_service_autostart

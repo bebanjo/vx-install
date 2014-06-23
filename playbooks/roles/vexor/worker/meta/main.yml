@@ -1,6 +1,6 @@
 ---
 dependencies:
+  - { role: docker/install }
   - { role: vexor/common }
   - { role: vexor/deploy }
-  - { role: docker/install }
 

@@ -5,17 +5,10 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-<<<<<<< Updated upstream
 
   config.vm.provider "virtualbox" do |vb, override|
-    #vb.vm.box_url = 'http://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box'
+    #vb.vm.box_url = 'https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box'
     override.vx.box = "ubuntu/trusty64"
-=======
-  config.vm.box = 'trusty64'
-
-  config.vm.provider "virtualbox" do |vb|
-    vb.vm.box_url = 'https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box'
->>>>>>> Stashed changes
   end
 
   config.vm.provider "vmware_fusion" do |fs, override|

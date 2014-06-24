@@ -4,7 +4,7 @@ upstream {{ vx_web_user }}_upstream {
 
 {% if vx_web_use_ssl %}
 server {
-  listen 443 ssl;
+  listen 80;
   server_name {{ vx_web_hostname }};
 
   rewrite ^ https://$host$request_uri? permanent;
@@ -12,7 +12,7 @@ server {
 {% endif %}
 
 server {
-  server_name _;
+  server_name {{ vx_web_hostname }};
 
   {% if vx_web_use_ssl %}
     listen 443;
@@ -77,13 +77,4 @@ server {
     root {{ vx_home }}/web/current/public;
   }
 
-}
-
-server {
-  listen 80;
-  server_name {{ vx_web_hostname }};
-
-  if ($scheme = http) {
-    return 301 https://$server_name$request_uri;
-  }
 }

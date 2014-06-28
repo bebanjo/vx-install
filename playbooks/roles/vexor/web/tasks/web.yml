@@ -70,7 +70,7 @@
   with_items:
     - "http"
     - "consumer"
-    - "as-notifier"
+    - "cloud-notifier"
 
 - name: add logrotate script
   template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_web_user }} mode="0644" owner=root

@@ -3,96 +3,20 @@
     name={{ vx_web_user }} comment="Vexor Web Worker"
     createhome=false system=true home={{ vx_home }}/web
 
-- name: upload ssl certificates
-  copy: src={{ item.l }} dest={{ item.r }} mode=0640 owner=nginx
-  with_items:
-    - { l: "{{ credentials_dir }}/vxweb.crt", r: "/etc/nginx/{{vx_web_user }}.crt" }
-    - { l: "{{ credentials_dir }}/vxweb.key", r: "/etc/nginx/{{vx_web_user}}.key" }
-  when: vx_web_use_ssl
-
-- name: create nginx vhost
-  template: src=nginx.j2 dest=/etc/nginx/conf.d/{{ vx_web_user }}.conf
-  notify: restart nginx service
-
 - name: install required packages
   apt: pkg={{ item }}
   with_items:
     - "nodejs"
     - "libpq-dev"
     - "logrotate"
+    - "golang"
 
-- name: create working directories
-  file: dest={{ item }} state=directory owner={{ vx_web_user }}
-  with_items:
-    - "{{ vx_home }}/web"
-    - "{{ vx_home }}/web/releases"
-    - "{{ vx_home }}/web/shared"
-    - "{{ vx_home }}/web/shared/log"
-    - "{{ vx_home }}/web/shared/tmp"
-    - "{{ vx_home }}/web/shared/tmp/pids"
-    - "{{ vx_home }}/web/shared/config"
-    - "{{ vx_home }}/web/shared/private"
-  tags: deploy
-
-- name: create files
-  template: >
-    dest={{ item.dest }} src={{ item.src }}
-    owner={{ vx_web_user }} mode={{ item.mode }}
-  with_items:
-    - { dest: "{{ vx_etc_path}}/vxweb.env", src: "env.j2", mode: "0600" }
-    - { dest: "{{ vx_home }}/web/deploy.rb", src: "deploy.j2", mode: "0644" }
-    - { dest: "{{ vx_home }}/web/shared/config/puma.rb", src: "puma.j2", mode: "0644" }
-    - { dest: "{{ vx_home }}/bin/{{ vx_web_user }}-http", src: "vxweb-http.j2", mode: "0755" }
-    - { dest: "{{ vx_home }}/bin/{{ vx_web_user }}-consumer", src: "vxweb-consumer.j2", mode: "0755" }
-    - { dest: "{{ vx_home }}/bin/{{ vx_web_user }}-as-notifier", src: "vxweb-as-notifier.j2", mode: "0755" }
-  register: create_result
-  tags: deploy
-
-- name: clone repo
-  git: >
-    repo="https://github.com/vexor/vx-web.git"
-    dest={{ vx_home }}/web/scm version={{ vx_web_branch }}
-    update=true force=true bare=true
-  register: clone_result
-  sudo_user: "{{ vx_web_user }}"
-  environment:
-    GIT_SSL_NO_VERIFY: true
-  tags: deploy
-
-- name: is deploy exists
-  shell: >
-    test -f {{ vx_home }}/web/current/{{ clone_result.after }} && echo "yes" || echo "no"
-  register: is_deploy_exists_result
-  changed_when: "'no' in is_deploy_exists_result.stdout"
-  tags: deploy
-
-- name: run deploy
-  shell: >
-    {{ vx_home }}/bin/deploy {{ clone_result.after }} chdir={{ vx_home }}/web
-  sudo_user: "{{ vx_web_user }}"
-  when: is_deploy_exists_result | changed or create_result | changed
-  tags: deploy
-  notify: restart vxweb services
-
-- name: create upstart jobs
-  template: dest=/etc/init/{{ vx_web_user }}-{{ item }}.conf src={{ item }}.upstart.j2
-  with_items:
-    - "http"
-    - "consumer"
-    - "as-notifier"
-  tags: deploy
-  notify: restart vxweb services
-
-- name: ensure services up and running
-  service: name={{vx_web_user}}-{{ item }} enabled=yes state=started
-  with_items:
-    - "http"
-    - "consumer"
-    - "as-notifier"
-
-- name: add logrotate script
-  template: src=logrotate.j2 dest=/etc/logrotate.d/{{ vx_web_user }} mode="0644" owner=root
+- include: web.yml
+  tags: vxweb
 
 - include: forwarder.yml
   tags: forwarder
   when: "{{ logstash_server | length > 0 }}"
+
+- include: sockd.yml
+  tags: vxsockd

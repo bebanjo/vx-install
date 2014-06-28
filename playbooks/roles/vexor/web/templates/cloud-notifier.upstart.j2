@@ -13,7 +13,7 @@ setgid {{ vx_web_user }}
 script
   home={{ vx_home }}/web/current
   user={{ vx_web_user }}
-  command="{{ vx_home }}/bin/{{ vx_web_user }}-as-notifier"
+  command="{{ vx_home }}/bin/{{ vx_web_user }}-cloud-notifier"
 
   chdir $home
   exec $command

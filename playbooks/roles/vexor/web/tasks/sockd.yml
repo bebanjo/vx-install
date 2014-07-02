@@ -1,0 +1,41 @@
+- name: "sockd | create working directories"
+  file: dest={{ item }} state=directory owner={{ vx_web_user }}
+  with_items:
+    - "{{ vx_home }}/sockd"
+
+- name: "sockd | clone repo"
+  git: >
+    repo="https://github.com/vexor/vx-sockd.git"
+    dest={{ vx_home }}/sockd/current version=master
+    update=true force=true
+  register: clone_result
+  sudo_user: "{{ vx_web_user }}"
+  environment:
+    GIT_SSL_NO_VERIFY: true
+
+- name: "sockd | build vx-sockd"
+  shell: >
+    go get github.com/mattn/gom &&
+    $GOPATH/bin/gom install &&
+    $GOPATH/bin/gom build -o vx-sockd
+    chdir={{ vx_home }}/sockd/current
+  notify: restart vxsockd service
+  sudo_user: "{{ vx_web_user }}"
+  environment:
+    GOPATH: "{{ vx_home }}/sockd/gopath"
+  when: clone_result | changed
+
+- name: "sockd | create files"
+  template: >
+    dest={{ item.dest }} src={{ item.src }}
+    owner={{ vx_web_user }} mode={{ item.mode }}
+  with_items:
+    - { dest: "{{ vx_home }}/bin/vxsockd", src: "vxsockd.j2", mode: "0700" }
+  notify: restart vxsockd service
+
+- name: "sockd | create upstart jobs"
+  template: dest=/etc/init/vxsockd.conf src=sockd.upstart.j2
+  notify: restart vxsockd service
+
+- name: "sockd | ensure service up and running"
+  service: name=vxsockd enabled=yes state=started

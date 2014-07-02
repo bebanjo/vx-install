@@ -1,0 +1,21 @@
+description "start and stop the vexor sock daemon"
+version "1.0"
+
+start on filesystem or runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+console log
+
+setuid {{ vx_web_user }}
+setgid {{ vx_web_user }}
+
+script
+  home={{ vx_home }}/sockd/current
+  user={{ vx_web_user }}
+  command="{{ vx_home }}/bin/vxsockd"
+
+  chdir $home
+  exec $command
+end script
+

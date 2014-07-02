@@ -1,0 +1,7 @@
+#!/bin/sh
+
+chdir {{ vx_home }}/sockd/current
+
+export RABBITMQ_URL="{{ rabbitmq_url }}"
+
+exec ./vx-sockd -bind localhost:8081

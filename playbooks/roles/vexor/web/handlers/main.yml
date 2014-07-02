@@ -4,7 +4,10 @@
   with_items:
     - { sv: "http", state: "reloaded" }
     - { sv: "consumer", state: "restarted" }
-    - { sv: "as-notifier", state: "restarted" }
+    - { sv: "cloud-notifier", state: "restarted" }
 
 - name: restart logstash-forwarder service
   service: name=logstash-forwarder state=restarted
+
+- name: restart vxsockd service
+  service: name=vxsockd state=restarted

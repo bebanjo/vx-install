@@ -83,3 +83,7 @@
 
 - include: mgmt.yml
   tags: mgmt
+
+- name: sync
+  shell: >
+    sync && sync && sync

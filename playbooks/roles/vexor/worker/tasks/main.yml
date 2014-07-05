@@ -78,8 +78,8 @@
   tags: forwarder
   when: "{{ logstash_server | length > 0 }}"
 
-- include: swap.yml
-  tags: swap
+#- include: swap.yml
+#  tags: swap
 
 - include: mgmt.yml
   tags: mgmt

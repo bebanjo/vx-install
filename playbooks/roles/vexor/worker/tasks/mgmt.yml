@@ -1,7 +1,7 @@
 - name: install cron job to cleanup old containers
   cron: >
-    minute=0
-    hour=3,5,7,9,11,13,15,17,19,21,23
+    minute=0,30
+    hour=*
     name="cleanup stopped containers"
     cron_file=docker_containers
     user="{{ vx_worker_user }}"

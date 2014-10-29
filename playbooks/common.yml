@@ -7,7 +7,7 @@
       action: ec2_facts
 
   roles:
-    - users
+    - { role: users, tags: 'users' }
     - environment
     - common
     - ntp

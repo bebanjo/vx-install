@@ -164,10 +164,9 @@ Rabbitmq
 If you experiment that the pushes to GitHub aren't shown on the web interface or the workers doesn't start the pending builds you can execute the following commands:
 
 ```sh
+ansible vexor-web -i inventory/production -m service -a "name=vxweb-http state=restarted" --sudo
 ansible vexor-web -i inventory/production -m service -a "name=vxweb-consumer state=restarted" --sudo
 ansible vexor-worker -i inventory/production -m service -a "name=vxworker state=restarted" --sudo
 # WebSockets
 ansible vexor-web -i inventory/production -m service -a "name=vxsockd state=restarted" --sudo
 ```
-
-

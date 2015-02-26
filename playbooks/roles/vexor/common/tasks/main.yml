@@ -11,11 +11,10 @@
     - "python-passlib"
 
 - name: add vexor apt repo key
-  apt_key: >
-    url="http://download.opensuse.org/repositories/home:/dmexe:/vexor/x{{ ansible_distribution }}_{{ ansible_distribution_version }}/Release.key"
+  apt_key: keyserver=keyserver.ubuntu.com id=0D7276CA
 
 - name: add vexor apt repo
   apt_repository: >
-    repo="deb http://download.opensuse.org/repositories/home:/dmexe:/vexor/x{{ ansible_distribution }}_{{ ansible_distribution_version }} /"
+    repo="deb https://s3-eu-west-1.amazonaws.com/bebanjo-apt-ruby/vexor stable main"
     state=present
 
